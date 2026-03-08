@@ -3,15 +3,24 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class Cliente(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    telefone = db.Column(db.String(50))
+    email = db.Column(db.String(100))
+
+
 class Produto(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    estoque = db.Column(db.Integer)
+    preco = db.Column(db.Float)
 
-    nome = db.Column(db.String(100), nullable=False)
 
-    quantidade = db.Column(db.Integer, nullable=False)
+class Fornecedor(db.Model):
 
-    estoque_minimo = db.Column(db.Integer, nullable=False)
-
-    def __repr__(self):
-        return f'<Produto {self.nome}>'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    telefone = db.Column(db.String(50))
