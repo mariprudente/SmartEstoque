@@ -1,0 +1,110 @@
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6f9;
+}
+
+/* layout */
+
+.container{
+display:flex;
+height:100vh;
+}
+
+/* menu lateral */
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+padding:20px;
+}
+
+.sidebar h2{
+text-align:center;
+margin-bottom:30px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+padding:12px;
+margin-bottom:10px;
+border-radius:5px;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* área principal */
+
+.main{
+flex:1;
+padding:40px;
+}
+
+/* cards */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(2,200px);
+gap:30px;
+margin-top:40px;
+}
+
+.card{
+background:white;
+padding:40px;
+text-align:center;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+text-decoration:none;
+color:black;
+font-size:20px;
+}
+
+.card i{
+font-size:40px;
+margin-bottom:10px;
+display:block;
+}
+
+/* formulário */
+
+.form-box{
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+max-width:900px;
+}
+
+.form-box input{
+width:100%;
+padding:8px;
+margin-top:5px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+.linha{
+display:flex;
+gap:20px;
+margin-top:10px;
+}
+
+.linha div{
+flex:1;
+}
+
+.btn{
+margin-top:20px;
+padding:10px 20px;
+border:none;
+background:#3498db;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
