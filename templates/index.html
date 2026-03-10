@@ -2,49 +2,61 @@
 <html>
 
 <head>
-<title>Produtos</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 
 <body>
 
-<a href="/">Voltar</a>
+<div class="container">
 
-<h1>Controle de Estoque</h1>
+{% include 'menu.html' %}
 
-<form action="/cadastrar" method="POST">
+<div class="content">
 
-<input type="text" name="nome" placeholder="Nome do produto" required>
+<h1>Bem-vindo!</h1>
 
-<input type="number" name="quantidade" placeholder="Quantidade" required>
+<div class="cards">
 
-<input type="number" name="estoque_minimo" placeholder="Estoque mínimo" required>
+<a class="card produto" href="/produtos">
+<i class="fa fa-box"></i>
+Produtos
+</a>
 
-<button type="submit">Cadastrar</button>
+<a class="card mov" href="/movimentacao">
+<i class="fa fa-rotate"></i>
+Movimentação
+</a>
 
-</form>
+<a class="card cliente" href="/clientes">
+<i class="fa fa-users"></i>
+Clientes
+</a>
 
-<h2>Lista de Produtos</h2>
+<a class="card fornecedor" href="/fornecedores">
+<i class="fa fa-truck"></i>
+Fornecedores
+</a>
 
-<ul>
+<a class="card caixa" href="/caixa">
+<i class="fa fa-sack-dollar"></i>
+Caixa
+</a>
 
-{% for produto in produtos %}
+<a class="card relatorio" href="/relatorios">
+<i class="fa fa-chart-column"></i>
+Relatórios
+</a>
 
-<li>
+</div>
 
-{{ produto.nome }} -
-Quantidade: {{ produto.quantidade }}
+</div>
 
-{% if produto.quantidade <= produto.estoque_minimo %}
-⚠ Estoque baixo
-{% endif %}
-
-<a href="/deletar/{{ produto.id }}">Excluir</a>
-
-</li>
-
-{% endfor %}
-
-</ul>
+</div>
 
 </body>
 </html>
