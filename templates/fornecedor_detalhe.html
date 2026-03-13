@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Detalhes do Fornecedor</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+{% include 'menu.html' %}
+
+<div class="content">
+
+<h2>Detalhes do Fornecedor</h2>
+
+<div class="form-box">
+
+<p><b>Razão Social:</b> {{ fornecedor.razao_social }}</p>
+
+<p><b>CNPJ:</b> {{ fornecedor.cnpj }}</p>
+
+<p><b>Contato:</b> {{ fornecedor.contato }}</p>
+
+<p><b>CEP:</b> {{ fornecedor.cep }}</p>
+
+<p><b>Endereço:</b> {{ fornecedor.endereco }}</p>
+
+<p><b>Número:</b> {{ fornecedor.numero }}</p>
+
+<p><b>Complemento:</b> {{ fornecedor.complemento }}</p>
+
+<p><b>Bairro:</b> {{ fornecedor.bairro }}</p>
+
+<p><b>Cidade:</b> {{ fornecedor.cidade }}</p>
+
+<p><b>UF:</b> {{ fornecedor.uf }}</p>
+
+<p><b>Telefone:</b> {{ fornecedor.telefone }}</p>
+
+<p><b>Celular:</b> {{ fornecedor.celular }}</p>
+
+<p><b>Email:</b> {{ fornecedor.email }}</p>
+
+<p><b>Observações:</b> {{ fornecedor.observacoes }}</p>
+
+<br>
+
+<a href="/fornecedores">⬅ Voltar</a>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

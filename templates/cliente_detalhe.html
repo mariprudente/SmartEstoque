@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Detalhes do Cliente</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+{% include 'menu.html' %}
+
+<div class="content">
+
+<h2>Detalhes do Cliente</h2>
+
+<div class="form-box">
+
+<p><b>Nome:</b> {{ cliente.nome }}</p>
+
+<p><b>CPF:</b> {{ cliente.cpf }}</p>
+
+<p><b>RG:</b> {{ cliente.rg }}</p>
+
+<p><b>Nascimento:</b> {{ cliente.nascimento }}</p>
+
+<p><b>Rua:</b> {{ cliente.rua }}</p>
+
+<p><b>Número:</b> {{ cliente.numero }}</p>
+
+<p><b>Cidade:</b> {{ cliente.cidade }}</p>
+
+<p><b>Estado:</b> {{ cliente.estado }}</p>
+
+<p><b>Telefone:</b> {{ cliente.telefone }}</p>
+
+<p><b>Celular:</b> {{ cliente.celular }}</p>
+
+<p><b>Email:</b> {{ cliente.email }}</p>
+
+<br>
+
+<a href="/clientes">Voltar</a>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

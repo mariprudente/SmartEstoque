@@ -12,7 +12,7 @@ display:flex;
 
 .sidebar{
 width:230px;
-height:100vh;
+min-height:100vh;
 background:linear-gradient(#2f4d7a,#1c3556);
 color:white;
 padding-top:20px;
@@ -114,4 +114,216 @@ border:none;
 padding:10px 20px;
 border-radius:4px;
 cursor:pointer;
+}
+
+/* TABELA CLIENTE */
+
+.tabela-clientes{
+
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
+
+}
+
+.tabela-clientes th{
+
+background:#2e6ed8;
+color:white;
+padding:10px;
+
+}
+
+.tabela-clientes td{
+
+padding:10px;
+border-bottom:1px solid #ddd;
+
+}
+
+.tabela-clientes tr:hover{
+
+background:#f2f2f2;
+
+}
+
+.btn-detalhe{
+
+background:#2e6ed8;
+color:white;
+padding:6px 10px;
+border-radius:5px;
+text-decoration:none;
+
+}
+
+.btn-detalhe:hover{
+
+background:#1d4fa3;
+
+}
+
+.btn-excluir{
+
+background:#d9534f;
+color:white;
+padding:6px 10px;
+border-radius:5px;
+text-decoration:none;
+
+}
+
+.btn-excluir:hover{
+
+background:#a94442;
+
+}
+
+/* ABA FORNECEDOR */
+
+.tabs{
+
+margin-bottom:20px;
+
+}
+
+.tablink{
+
+background:#2e6ed8;
+color:white;
+border:none;
+padding:10px 20px;
+cursor:pointer;
+margin-right:5px;
+border-radius:5px;
+
+}
+
+.tablink:hover{
+
+background:#1d4fa3;
+
+}
+
+/* PRODUTO */
+
+.switch {
+
+position: relative;
+display: inline-block;
+width: 50px;
+height: 24px;
+
+}
+
+.switch input {
+
+opacity: 0;
+width: 0;
+height: 0;
+
+}
+
+.slider {
+
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+
+background-color: #ccc;
+
+transition: .4s;
+border-radius: 24px;
+
+}
+
+.slider:before {
+
+position: absolute;
+content: "";
+
+height: 18px;
+width: 18px;
+
+left: 3px;
+bottom: 3px;
+
+background-color: white;
+
+transition: .4s;
+border-radius: 50%;
+
+}
+
+input:checked + .slider {
+
+background-color: #2e6ed8;
+
+}
+
+input:checked + .slider:before {
+
+transform: translateX(26px);
+
+}
+
+.campo-grande{
+
+width:400px;
+padding:8px;
+
+}
+
+.campo-observacao{
+
+width:700px;
+height:80px;
+resize:vertical;
+
+}
+
+.upload-imagem{
+
+margin-top:10px;
+
+}
+
+.imagem-preview{
+
+width:160px;
+height:160px;
+
+border:2px dashed #ccc;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+cursor:pointer;
+
+position:relative;
+
+}
+
+.imagem-preview img{
+
+max-width:100%;
+max-height:100%;
+
+}
+
+.icone-camera{
+
+position:absolute;
+font-size:30px;
+opacity:0.6;
+
+}
+
+#foto{
+display:none;
 }
