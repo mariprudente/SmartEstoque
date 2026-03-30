@@ -519,7 +519,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all() 
 
-        # --- FORÇAR CRIAÇÃO DO ARQUIVO FALTANTE ---
         pasta_config = os.path.join(app.template_folder, 'config')
         arquivo_html = os.path.join(pasta_config, 'visualizar_usuario.html')
 

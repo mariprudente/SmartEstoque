@@ -9,10 +9,6 @@
 body {
     background-color: #f0f2f5;
 }
-
-/* SIDEBAR (Igual à imagem) */
-/* No seu style.css */
-
 .sidebar {
     width: 250px; /* Largura da barra */
     background-color: #3b5998;
@@ -21,13 +17,13 @@ body {
     position: fixed; /* Ela fica presa na tela */
     top: 0;
     left: 0;
-    z-index: 1000; /* Garante que ela fique por cima */
+    z-index: 1000; 
 }
 
 .content {
     flex: 1;
     padding: 40px;
-    margin-left: 250px; /* ISSO AQUI resolve o problema! */
+    margin-left: 250px; 
     background-color: #f8f9fa;
     min-height: 100vh;
 }
