@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fa fa-rotate"></i> Movimentação de Estoque</h2>
+
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="openTab(event, 'CadastrarMov')">Registrar Movimentação</button>
+        <button class="tab-btn" onclick="openTab(event, 'HistoricoMov')">Histórico de Entradas/Saídas</button>
+    </div>
+
+    <div id="CadastrarMov" class="tab-content show">
+        <div class="card-box">
+            <form action="{{ url_for('movimentacao') }}" method="POST" class="form-grid">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label><i class="fa fa-box"></i> Produto:</label>
+                    <select name="produto_id" required class="select-full">
+                        <option value="" disabled selected>Selecione um produto para movimentar...</option>
+                        {% for p in produtos %}
+                        <option value="{{ p.id }}">{{ p.nome }} (Estoque atual: {{ p.estoque_atual }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-arrow-right-arrow-left"></i> Tipo de Operação:</label>
+                    <select name="tipo" required class="select-full">
+                        <option value="Entrada">Entrada (+)</option>
+                        <option value="Saida">Saída (-)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-list-ol"></i> Quantidade:</label>
+                    <input type="number" name="quantidade" min="1" placeholder="Ex: 10" required class="input-full">
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label><i class="fa fa-comment-dots"></i> Observações:</label>
+                    <textarea name="observacoes" rows="4" placeholder="Descreva o motivo (Ex: Compra com NF 123, Ajuste de inventário, etc.)" class="textarea-full"></textarea>
+                </div>
+
+                <button type="submit" class="btn-save" style="grid-column: span 2;">
+                    <i class="fa fa-check-circle"></i> Registrar Movimentação
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="HistoricoMov" class="tab-content">
+        <div class="card-box">
+            <table class="table-estoque">
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Qtd</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movimentacoes %}
+                    <tr>
+                        <td>{{ m.data_registro.strftime('%d/%m/%Y %H:%M') if m.data_registro else '-' }}</td>
+                        <td><strong>{{ m.produto.nome }}</strong></td>
+                        <td>
+                            <span class="badge {{ 'badge-entrada' if m.tipo == 'Entrada' else 'badge-saida' }}">
+                                {{ m.tipo }}
+                            </span>
+                        </td>
+                        <td>{{ m.quantidade }}</td>
+                        <td><small>{{ m.observacoes }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos das Abas */
+    .tab-container { border-bottom: 2px solid #ddd; margin-bottom: 20px; display: flex; gap: 10px; }
+    .tab-btn { padding: 12px 25px; border: none; background: none; cursor: pointer; font-size: 16px; color: #666; transition: 0.3s; border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: #2c3e50; border-bottom: 3px solid #3498db; font-weight: bold; }
+    
+    .tab-content { display: none; animation: fadeIn 0.4s; }
+    .tab-content.show { display: block; }
+
+    /* Estilos Gerais */
+    .card-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .select-full, .input-full, .textarea-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-top: 5px; font-size: 15px; }
+    
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+    .badge-entrada { background: #e1f7e7; color: #27ae60; }
+    .badge-saida { background: #ffe9e9; color: #e74c3c; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("show");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("show");
+        evt.currentTarget.classList.add("active");
+    }
+</script>
+{% endblock %}

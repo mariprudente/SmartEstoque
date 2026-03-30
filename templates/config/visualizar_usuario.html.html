@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fa fa-user-edit"></i> Detalhes e Edição de Usuário</h2>
+    
+    <div class="card-box">
+        <form action="{{ url_for('editar_usuario', id=usuario.id) }}" method="POST" class="form-grid">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Nome Completo:</label>
+                <input type="text" name="nome_completo" value="{{ usuario.nome_completo }}" class="input-full" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Nome de Usuário (Login):</label>
+                <input type="text" name="username" value="{{ usuario.username }}" class="input-full" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Função / Cargo:</label>
+                <select name="funcao" class="select-full">
+                    <option value="Proprietário" {{ 'selected' if usuario.funcao == 'Proprietário' }}>Proprietário</option>
+                    <option value="Gerente" {{ 'selected' if usuario.funcao == 'Gerente' }}>Gerente</option>
+                    <option value="Funcionário" {{ 'selected' if usuario.funcao == 'Funcionário' }}>Funcionário</option>
+                    <option value="Vendedor" {{ 'selected' if usuario.funcao == 'Vendedor' }}>Vendedor</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Nova Senha (deixe em branco para não alterar):</label>
+                <input type="password" name="password" placeholder="******" class="input-full">
+            </div>
+
+            <div style="grid-column: span 2; margin-top: 20px; display: flex; gap: 10px;">
+                <button type="submit" class="btn-save">Atualizar Cadastro</button>
+                <a href="{{ url_for('gerenciar_usuarios') }}" class="btn-main" style="background: #95a5a6;">Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

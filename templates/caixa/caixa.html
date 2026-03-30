@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Fluxo de Caixa - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container">
+        {% include 'layout/menu.html' %}
+
+        <div class="content">
+            <div class="header-page" style="display: flex; justify-content: space-between; align-items: center;">
+                <h1><i class="fas fa-cash-register"></i> Fluxo de Caixa</h1>
+                <a href="{{ url_for('nova_venda') }}" class="btn-action green"><i class="fas fa-plus"></i> Nova Venda</a>
+            </div>
+            
+            <hr style="margin-bottom: 20px; border: 0; border-top: 1px solid #ddd;">
+
+            <div class="caixa-header card-box" style="background: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="info-caixa">
+                    <span style="color: #666; font-size: 0.9em;">Saldo Atual (Geral)</span>
+                    <h1 style="font-size: 2.5em; margin: 5px 0;" class="{{ 'positivo' if saldo >= 0 else 'negativo' }}">
+                        R$ {{ "%.2f"|format(saldo) }}
+                    </h1>
+                </div>
+                <div class="detalhes-resumo" style="text-align: right;">
+                    <p>Total em Vendas: <span class="positivo" style="font-weight: bold;">+ R$ {{ "%.2f"|format(total_vendas) }}</span></p>
+                    <p>Total em Despesas: <span class="negativo" style="font-weight: bold;">- R$ {{ "%.2f"|format(total_despesas) }}</span></p>
+                    <p style="border-top: 1px solid #eee; margin-top: 5px; padding-top: 5px;">
+                        Lucro Estimado: <span style="color: #217346; font-weight: bold;">R$ {{ "%.2f"|format(lucro_vendas) }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-box" style="margin-top: 20px; background: white; padding: 20px; border-radius: 10px;">
+                <h3><i class="fas fa-file-invoice-dollar"></i> Lançar Despesa (Saída)</h3>
+                <form action="/caixa/despesa/salvar" method="POST" class="form-inline" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <input type="text" name="descricao" placeholder="Descrição (Ex: Aluguel)" required style="flex: 2; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <input type="number" step="0.01" name="valor" placeholder="Valor R$" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <button type="submit" class="btn-action red" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        Cadastrar Saída
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-box" style="margin-top: 20px; background: white; padding: 20px; border-radius: 10px;">
+                <h3><i class="fas fa-history"></i> Histórico Recente</h3>
+                <table class="modern-table" style="width: 100%; margin-top: 15px;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in vendas %}
+                        <tr>
+                            <td>{{ v.data_venda.strftime('%d/%m/%Y') }}</td>
+                            <td>Venda ao Cliente</td>
+                            <td><span class="badge green" style="background: #27ae60; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8em;">ENTRADA</span></td>
+                            <td class="positivo">R$ {{ "%.2f"|format(v.valor_total) }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        {% for d in despesas %}
+                        <tr>
+                            <td>{{ d.data.strftime('%d/%m/%Y') if d.data else '-' }}</td>
+                            <td>{{ d.descricao }}</td>
+                            <td><span class="badge red" style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8em;">SAÍDA</span></td>
+                            <td class="negativo">R$ {{ "%.2f"|format(d.valor) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .positivo { color: #28a745; }
+        .negativo { color: #dc3545; }
+        .modern-table { border-collapse: collapse; width: 100%; }
+        .modern-table th, .modern-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+    </style>
+</body>
+</html>

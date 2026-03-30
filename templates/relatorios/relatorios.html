@@ -1,0 +1,111 @@
+{% include 'layout/menu.html' %}
+<div class="content">
+    <div class="report-header-screen">
+        <h2>Relatórios Geral de Movimentação</h2>
+        <button onclick="window.print()" class="btn-print">
+            <i class="fas fa-print"></i> Imprimir / Salvar PDF
+        </button>
+    </div>
+
+    <div class="print-only-header">
+        <div class="company-info-print">
+            <h1>{{ session.get('razao_social_empresa', 'NOME DA EMPRESA LTDA') }}</h1>
+            <p>CNPJ: {{ session.get('cnpj_empresa', '00.000.000/0000-00') }}</p>
+            <p>Contato: {{ session.get('contato_empresa', 'Nome do Contato') }} - {{ session.get('celular_empresa', '(00) 00000-0000') }}</p>
+        </div>
+        <hr>
+        <center><h3>RELATÓRIO MENSAL - {{ mes_nome }}</h3></center>
+    </div>
+
+    <div class="card-box">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Categoria</th>
+                    <th>Descrição/Produto</th>
+                    <th>Entrada (R$)</th>
+                    <th>Saída (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in consolidado %}
+                <tr>
+                    <td>{{ item.data }}</td>
+                    <td>
+                        <span class="badge-tipo">
+                            {{ 'Produto' if item.origem == 'estoque' else 'Outros' }}
+                        </span>
+                    </td>
+                    <td>{{ item.descricao }}</td>
+                    <td class="text-green">
+                        {{ "R$ %.2f"|format(item.valor_entrada) if item.valor_entrada > 0 else '-' }}
+                    </td>
+                    <td class="text-red">
+                        {{ "R$ %.2f"|format(item.valor_saida) if item.valor_saida > 0 else '-' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="row-total">
+                    <td colspan="3" align="right"><strong>TOTAL DO MÊS:</strong></td>
+                    <td class="text-green"><strong>R$ {{ "%.2f"|format(total_entradas) }}</strong></td>
+                    <td class="text-red"><strong>R$ {{ "%.2f"|format(total_saidas) }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Estilos para tela */
+    .report-header-screen {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .btn-print {
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .text-green { color: #28a745; }
+    .text-red { color: #dc3545; }
+    .badge-tipo {
+        background: #f0f0f0;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+    }
+    .row-total { background-color: #f9f9f9; font-size: 1.1rem; }
+
+    /* CSS DE IMPRESSÃO - O PULO DO GATO */
+    .print-only-header { display: none; }
+
+    @media print {
+        /* Esconde menu lateral, botões e elementos de navegação */
+        .sidebar, .btn-print, .top-bar, .report-header-screen h2 {
+            display: none !important;
+        }
+        .content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+        
+        /* Mostra o cabeçalho da empresa */
+        .print-only-header {
+            display: block !important;
+            margin-bottom: 20px;
+        }
+        .company-info-print h1 { font-size: 22px; margin-bottom: 5px; }
+        .company-info-print p { margin: 2px 0; font-size: 14px; }
+        
+        /* Ajusta a tabela para ocupar a folha toda */
+        .card-box { box-shadow: none; border: none; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { border: 1px solid #ccc; padding: 8px; }
+    }
+</style>

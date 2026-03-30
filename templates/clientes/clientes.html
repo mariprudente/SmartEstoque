@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+    <div class="main-container" style="display: flex; min-height: 100vh;">
+        {% include 'layout/menu.html' %}
+
+        <div class="content" style="flex: 1; padding: 40px; background-color: #f8f9fa;">
+            <div class="header-page" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1><i class="fas fa-users" style="color: #27ae60;"></i> Gestão de Clientes</h1>
+            </div>
+
+            <div class="tab-container" style="margin-bottom: 20px;">
+                <button class="tab-btn active" onclick="openTab('cadastro')">Cadastrar Cliente</button>
+                <button class="tab-btn" onclick="openTab('consulta')">Consultar Clientes</button>
+            </div>
+
+            <div id="cadastro" class="tab-content card-box" style="display: block; border-radius: 15px;">
+                <form action="{{ url_for('salvar_cliente') }}" method="POST" class="form-grid">
+                    <div class="input-group full">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" placeholder="Digite o nome" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" class="cpf" placeholder="000.000.000-00" required>
+                    </div>
+                    <div class="input-group">
+                        <label>RG</label>
+                        <input type="text" name="rg" class="rg" placeholder="00.000.000-0">
+                    </div>
+                    <div class="input-group">
+                        <label>Data de Nascimento</label>
+                        <input type="text" name="data_nascimento" class="date" placeholder="DD/MM/AAAA">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="exemplo@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Rua</label>
+                        <input type="text" name="rua">
+                    </div>
+                    <div class="input-group">
+                        <label>Número</label>
+                        <input type="text" name="numero">
+                    </div>
+                    <div class="input-group">
+                        <label>Cidade</label>
+                        <input type="text" name="cidade">
+                    </div>
+                    <div class="input-group">
+                        <label>Estado</label>
+                        <select name="estado">
+                            <option value="">Selecione</option>
+                            <option value="AC">Acre</option> <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option> <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option> <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option> <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option> <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option> <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option> <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option> <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option> <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option> <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option> <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option> <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option> <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Telefone Fixo</label>
+                        <input type="text" name="telefone" class="phone" placeholder="(00) 0000-0000">
+                    </div>
+                    <div class="input-group">
+                        <label>Celular</label>
+                        <input type="text" name="celular" class="sp_celphones" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="full" style="text-align: right; margin-top: 20px;">
+                        <button type="submit" class="btn-action green">Salvar Cliente</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="consulta" class="tab-content card-box" style="display: none; border-radius: 15px;">
+                <div class="search-bar" style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="busca" class="cpf" placeholder="Consultar por Nome ou CPF..." style="flex: 1;">
+                    <button class="btn-action blue">Buscar</button>
+                </div>
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        <tr>
+                            <td>{{ c.nome }}</td>
+                            <td>{{ c.cpf }}</td>
+                            <td>{{ c.celular }}</td>
+                            <td>
+                                <a href="{{ url_for('visualizar_cliente', id=c.id) }}" class="btn-icon blue"><i class="fas fa-eye"></i></a>
+                                <a href="{{ url_for('editar_cliente', id=c.id) }}" class="btn-icon orange"><i class="fas fa-edit"></i></a>
+                                <button type="button" class="btn-icon red" onclick="confirmarExcluirCliente('{{ c.id }}', '{{ c.nome }}')" title="Excluir Cliente">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica das Abas
+        function openTab(tabName) {
+            $(".tab-content").hide();
+            $(".tab-btn").removeClass("active");
+            $("#" + tabName).show();
+            $(event.currentTarget).addClass("active");
+        }
+
+        // NOVA FUNÇÃO: Confirmar Exclusão de Cliente
+    function confirmarExcluirCliente(id, nome) {
+        Swal.fire({
+            title: 'Remover Cliente?',
+            text: "Tem certeza que deseja excluir '" + nome + "'? Todos os dados vinculados a ele serão perdidos.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sim, excluir!',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redireciona para a rota do Flask
+                window.location.href = "/clientes/excluir/" + id;
+            }
+        })
+    }
+
+        // Aplicação das Máscaras
+        $(document).ready(function(){
+            $('.cpf').mask('000.000.000-00');
+            $('.rg').mask('00.000.000-0');
+            $('.date').mask('00/00/0000');
+            $('.phone').mask('(00) 0000-0000');
+            var SPMaskBehavior = function (val) {
+                return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+            },
+            spOptions = {
+                onKeyPress: function(val, e, field, options) {
+                    field.mask(SPMaskBehavior.apply({}, arguments), options);
+                }
+            };
+            $('.sp_celphones').mask(SPMaskBehavior, spOptions);
+        });
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Editar Fornecedor</h2>
+    <form action="{{ url_for('atualizar_fornecedor', id=fornecedor.id) }}" method="POST" class="form-grid">
+        <input type="text" name="razao_social" value="{{ fornecedor.razao_social }}" required>
+        <input type="text" name="cnpj" value="{{ fornecedor.cnpj }}">
+        <input type="text" name="nome_contato" value="{{ fornecedor.nome_contato }}">
+        <input type="email" name="email" value="{{ fornecedor.email }}">
+        <input type="text" name="telefone" value="{{ fornecedor.telefone }}">
+        <input type="text" name="celular" value="{{ fornecedor.celular }}">
+        <input type="text" name="cidade" value="{{ fornecedor.cidade }}">
+        <input type="text" name="estado" value="{{ fornecedor.estado }}">
+        <textarea name="observacoes" style="grid-column: span 2;">{{ fornecedor.observacoes }}</textarea>
+        <div style="grid-column: span 2;">
+            <button type="submit" class="btn-save">Atualizar</button>
+            <a href="{{ url_for('fornecedores') }}" class="btn-cancel">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

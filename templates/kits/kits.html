@@ -1,0 +1,58 @@
+{% include 'layout/menu.html' %}
+<div class="content">
+    <h2>Gerenciamento de Kits</h2>
+
+    <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'CadastrarKit')">Cadastrar Kit</button>
+        <button class="tablinks" onclick="openTab(event, 'ConsultarKit')">Consultar Kit</button>
+    </div>
+
+    <div id="CadastrarKit" class="tabcontent" style="display:block;">
+        <form action="/kits/salvar" method="POST">
+            <input type="text" name="nome_kit" placeholder="Nome do Kit (ex: Revisão 10km)" required style="width: 100%; margin-bottom: 20px;">
+            
+            <div id="container-produtos-kit">
+                <h3>Produtos do Kit</h3>
+                <div class="kit-item" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select name="produto_id[]" required onchange="adicionarNovaLinha(this)">
+                        <option value="">Selecione um produto...</option>
+                        {% for p in produtos %}
+                        <option value="{{ p.id }}">{{ p.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="removerLinha(this)" class="btn-delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save" style="margin-top: 20px;">Salvar Kit</button>
+            <a href="/produtos" class="btn-back">Voltar para Produtos</a>
+        </form>
+    </div>
+</div>
+
+<script>
+// Lógica para adicionar nova caixa flutuante ao selecionar um item
+function adicionarNovaLinha(selectElement) {
+    const container = document.getElementById('container-produtos-kit');
+    const todasLinhas = container.getElementsByClassName('kit-item');
+    const ultimaLinha = todasLinhas[todasLinhas.length - 1];
+    
+    // Se o usuário selecionou algo na última linha, cria uma nova embaixo
+    if (selectElement === ultimaLinha.querySelector('select') && selectElement.value !== "") {
+        const novaLinha = ultimaLinha.cloneNode(true);
+        novaLinha.querySelector('select').value = ""; // Limpa a seleção da nova linha
+        container.appendChild(novaLinha);
+    }
+}
+
+function removerLinha(botao) {
+    const container = document.getElementById('container-produtos-kit');
+    if (container.getElementsByClassName('kit-item').length > 1) {
+        botao.parentElement.remove();
+    } else {
+        alert("O kit deve ter pelo menos um produto.");
+    }
+}
+</script>

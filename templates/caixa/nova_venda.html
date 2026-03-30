@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Venda - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container">
+        {% include 'layout/menu.html' %}
+
+        <div class="content">
+            <h1><i class="fas fa-cart-shopping" style="color: #27ae60;"></i> Ponto de Venda</h1>
+            
+            <form action="{{ url_for('finalizar_venda') }}" method="POST" id="form-venda">
+                <div class="card-box form-grid" style="background: white; padding: 20px; border-radius: 10px;">
+                    
+                    <div class="input-group full">
+                        <label>Cliente</label>
+                        <select name="cliente_id" required>
+                            <option value="">Selecione o cliente...</option>
+                            {% for c in clientes %}
+                                <option value="{{ c.id }}">{{ c.nome }} ({{ c.cpf }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group" style="flex: 2;">
+                        <label>Adicionar Produto ou Kit</label>
+                        <select id="select-produto">
+                            <option value="">Escolha um item...</option>
+                            {% for p in produtos %}
+                                <option value="{{ p.id }}" data-preco="{{ p.preco_venda }}" data-nome="{{ p.nome }}">
+                                    {{ p.nome }} - R$ {{ "%.2f"|format(p.preco_venda) }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group" style="flex: 1;">
+                        <label>Qtd</label>
+                        <input type="number" id="qtd-produto" value="1" min="1">
+                    </div>
+
+                    <div class="input-group" style="display: flex; align-items: flex-end;">
+                        <button type="button" onclick="addAoCarrinho()" class="btn-action blue">Adicionar</button>
+                    </div>
+
+                    <div class="full" style="margin-top: 20px;">
+                        <table class="modern-table" id="tabela-itens">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Qtd</th>
+                                    <th>Unitário</th>
+                                    <th>Subtotal</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+
+                    <div class="full" style="text-align: right; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px;">
+                        <h2 style="margin-bottom: 15px;">Total: R$ <span id="total-venda">0,00</span></h2>
+                        <input type="hidden" name="valor_total_hidden" id="valor_total_hidden" value="0">
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <select name="forma_pagamento" required style="width: 200px;">
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                <option value="Cartão de Débito">Cartão de Débito</option>
+                                <option value="PIX">PIX</option>
+                            </select>
+                            <button type="submit" class="btn-action green">Finalizar Venda</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let totalGeral = 0;
+
+        function addAoCarrinho() {
+            const select = document.getElementById('select-produto');
+            const pId = select.value;
+            const pNome = select.options[select.selectedIndex].getAttribute('data-nome');
+            const pPreco = parseFloat(select.options[select.selectedIndex].getAttribute('data-preco'));
+            const qtd = parseInt(document.getElementById('qtd-produto').value);
+
+            if (!pId) return alert("Selecione um produto!");
+
+            const subtotal = pPreco * qtd;
+            totalGeral += subtotal;
+
+            const novaLinha = `
+                <tr id="linha-${pId}">
+                    <td>${pNome} <input type="hidden" name="produtos[]" value="${pId}"></td>
+                    <td>${qtd} <input type="hidden" name="quantidades[]" value="${qtd}"></td>
+                    <td>R$ ${pPreco.toFixed(2)}</td>
+                    <td>R$ ${subtotal.toFixed(2)}</td>
+                    <td><button type="button" onclick="removerItem(${pId}, ${subtotal})" class="btn-icon red"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `;
+
+            $("#tabela-itens tbody").append(novaLinha);
+            atualizarTotal();
+        }
+
+        function removerItem(id, valor) {
+            $(`#linha-${id}`).remove();
+            totalGeral -= valor;
+            atualizarTotal();
+        }
+
+        function atualizarTotal() {
+            document.getElementById('total-venda').innerText = totalGeral.toFixed(2);
+            document.getElementById('valor_total_hidden').value = totalGeral.toFixed(2);
+        }
+    </script>
+</body>
+</html>

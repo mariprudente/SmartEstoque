@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Detalhes do Fornecedor</h2>
+    <div class="card-detalhes">
+        <p><strong>Razão Social:</strong> {{ fornecedor.razao_social }}</p>
+        <p><strong>CNPJ:</strong> {{ fornecedor.cnpj }}</p>
+        <p><strong>Contato:</strong> {{ fornecedor.nome_contato }}</p>
+        <p><strong>E-mail:</strong> {{ fornecedor.email }}</p>
+        <p><strong>Telefone/Celular:</strong> {{ fornecedor.telefone }} / {{ fornecedor.celular }}</p>
+        <p><strong>Localização:</strong> {{ fornecedor.cidade }} - {{ fornecedor.estado }}</p>
+        <p><strong>Observações:</strong> {{ fornecedor.observacoes }}</p>
+    </div>
+    <br>
+    <a href="{{ url_for('fornecedores') }}" class="btn-main">Voltar</a>
+</div>
+{% endblock %}

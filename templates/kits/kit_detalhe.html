@@ -1,0 +1,56 @@
+{% include 'layout/menu.html' %}
+<div class="content">
+    <h2>Detalhes do Kit: {{ kit.nome }}</h2>
+    
+    <form action="/kits/editar/{{ kit.id }}" method="POST">
+        <div class="form-group">
+            <label>Nome do Kit:</label>
+            <input type="text" name="nome_kit" value="{{ kit.nome }}" required style="width: 100%;">
+        </div>
+
+        <div id="container-produtos-kit" style="margin-top: 20px;">
+            <h3>Produtos Inclusos</h3>
+            {% for item in kit.produtos %}
+            <div class="kit-item" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select name="produto_id[]">
+                    {% for p in todos_produtos %}
+                    <option value="{{ p.id }}" {% if p.id == item.id %}selected{% endif %}>{{ p.nome }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" onclick="removerLinha(this)" class="btn-delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            {% endfor %}
+            
+            <div class="kit-item" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select name="produto_id[]" onchange="adicionarNovaLinha(this)">
+                    <option value="">+ Adicionar outro produto ao kit...</option>
+                    {% for p in todos_produtos %}
+                    <option value="{{ p.id }}">{{ p.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="action-footer" style="margin-top: 30px;">
+            <button type="submit" class="btn-save">Salvar Kit</button>
+            <a href="/kits" class="btn-back">Voltar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function adicionarNovaLinha(selectElement) {
+    if (selectElement.value !== "") {
+        const container = document.getElementById('container-produtos-kit');
+        const novaLinha = selectElement.parentElement.cloneNode(true);
+        novaLinha.querySelector('select').value = "";
+        container.appendChild(novaLinha);
+    }
+}
+
+function removerLinha(botao) {
+    botao.parentElement.remove();
+}
+</script>

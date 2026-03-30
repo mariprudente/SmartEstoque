@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-cog"></i>
+        <span>SISTEMA DE GESTÃO</span>
+    </div>
+    <ul class="nav-links">
+        <li><a href="{{ url_for('index') }}"><i class="fa fa-home"></i>INICIO</a></li>
+        <li><a href="{{ url_for('clientes') }}"><i class="fa fa-users"></i> CLIENTES</a></li>
+        <li><a href="{{ url_for('produtos') }}"><i class="fa fa-box"></i> PRODUTOS</a></li>
+        <li><a href="{{ url_for('fornecedores') }}"><i class="fa fa-truck"></i> FORNECEDOR</a></li>
+        <li><a href="{{ url_for('movimentacao') }}"><i class="fa fa-rotate"></i> MOVIMENTAÇÃO</a></li>
+        <li><a href="{{ url_for('caixa') }}"><i class="fa fa-sack-dollar"></i> CAIXA</a></li>
+        <li><a href="{{ url_for('estoque') }}"><i class="fa fa-chart-column"></i> RELATÓRIOS</a></li>
+        <li><a href="{{ url_for('configuracoes') }}"><i class="fa fa-gear"></i> CONFIGURAÇÕES</a></li>
+        <li><a href="{{ url_for('logout') }}" class="menu-item logout-btn"><i class="fa fa-sign-out-alt"></i> SAIR</a></li>
+    </ul>
+</div>
+
+<style>
+    .sidebar {
+        width: 260px;
+        background-color: #2c3e50;
+        min-height: 100vh;
+        color: white;
+        flex-shrink: 0;
+    }
+    .sidebar-header {
+        padding: 25px;
+        background: #1a252f;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: bold;
+    }
+    .nav-links { list-style: none; padding: 0; }
+    .nav-links li a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px 25px;
+        color: #bdc3c7;
+        text-decoration: none;
+        transition: 0.3s;
+        border-bottom: 1px solid #34495e;
+    }
+    .nav-links li a:hover {
+        background: #34495e;
+        color: white;
+    }
+    .nav-links i { width: 25px; text-align: center; }
+</style>

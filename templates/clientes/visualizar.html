@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dados do Cliente - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container" style="display: flex;">
+        {% include 'layout/menu.html' %}
+
+        <div class="content" style="flex: 1; padding: 40px; background-color: #f8f9fa;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h1><i class="fas fa-id-card"></i> Detalhes: {{ cliente.nome }}</h1>
+                <a href="{{ url_for('clientes') }}" class="btn-action blue" style="text-decoration: none;"><i class="fas fa-arrow-left"></i> Voltar</a>
+            </div>
+
+            <div class="card-box" style="border-radius: 20px; padding: 30px;">
+                <div class="form-grid">
+                    <div class="full"><h3 style="color: #27ae60; margin-bottom: 15px;">Dados Pessoais</h3></div>
+                    <div class="input-group"><strong>CPF:</strong> <p>{{ cliente.cpf }}</p></div>
+                    <div class="input-group"><strong>RG:</strong> <p>{{ cliente.rg }}</p></div>
+                    <div class="input-group"><strong>Nascimento:</strong> <p>{{ cliente.data_nascimento }}</p></div>
+                    <div class="input-group"><strong>E-mail:</strong> <p>{{ cliente.email }}</p></div>
+
+                    <div class="full"><h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 15px;">Endereço</h3></div>
+                    <div class="input-group"><strong>Rua:</strong> <p>{{ cliente.rua }}, {{ cliente.numero }}</p></div>
+                    <div class="input-group"><strong>Cidade/Estado:</strong> <p>{{ cliente.cidade }} - {{ cliente.estado }}</p></div>
+
+                    <div class="full"><h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 15px;">Contato</h3></div>
+                    <div class="input-group"><strong>Telefone:</strong> <p>{{ cliente.telefone }}</p></div>
+                    <div class="input-group"><strong>Celular:</strong> <p>{{ cliente.celular }}</p></div>
+                </div>
+
+                <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; text-align: right;">
+                    <a href="{{ url_for('editar_cliente', id=cliente.id) }}" class="btn-action orange" style="text-decoration: none;">
+                        <i class="fas fa-edit"></i> Editar Informações
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

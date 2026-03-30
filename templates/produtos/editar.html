@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Produto - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container" style="display: flex;">
+        {% include 'layout/menu.html' %}
+
+        <div class="content" style="flex: 1; padding: 40px;">
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px;">
+                <a href="{{ url_for('produtos') }}" class="btn-icon blue"><i class="fas fa-arrow-left"></i></a>
+                <h1>Editando: {{ produto.nome }}</h1>
+            </div>
+
+            <form action="{{ url_for('atualizar_produto', id=produto.id) }}" method="POST" class="form-grid" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                
+                <div class="input-group">
+                    <label>Código (ID)</label>
+                    <input type="text" value="#{{ produto.id }}" disabled style="background: #f5f5f5;">
+                </div>
+
+                <div class="input-group">
+                    <label>Situação</label>
+                    <div style="display: flex; align-items: center; height: 45px; gap: 10px;">
+                        <input type="checkbox" name="situacao" {% if produto.situacao %}checked{% endif %} style="width: 20px; height: 20px;">
+                        <span>Ativo</span>
+                    </div>
+                </div>
+
+                <div class="input-group full">
+                    <label>Nome do Produto</label>
+                    <input type="text" name="nome" value="{{ produto.nome }}" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Marca</label>
+                    <input type="text" name="marca" value="{{ produto.marca }}">
+                </div>
+
+                <div class="input-group">
+                    <label>Fornecedor</label>
+                    <select name="fornecedor_id">
+                        <option value="">Nenhum Fornecedor</option>
+                        {% for f in fornecedores %}
+                            <option value="{{ f.id }}" {% if f.id == produto.fornecedor_id %}selected{% endif %}>
+                                {{ f.razao_social }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Preço de Venda (R$)</label>
+                    <input type="number" step="0.01" name="preco_venda" value="{{ produto.preco_venda }}">
+                </div>
+
+                <div class="input-group">
+                    <label>Estoque Atual</label>
+                    <input type="number" name="estoque_atual" value="{{ produto.estoque_atual }}">
+                </div>
+
+                <div class="input-group full">
+                    <label>Observações</label>
+                    <textarea name="observacoes" rows="4">{{ produto.observacoes }}</textarea>
+                </div>
+
+                <div class="full" style="text-align: right; margin-top: 20px;">
+                    <button type="submit" class="btn-action green">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

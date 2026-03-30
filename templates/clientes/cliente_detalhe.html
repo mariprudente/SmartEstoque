@@ -1,0 +1,20 @@
+{% include 'layout/menu.html' %}
+<div class="content">
+    <h2>Detalhes do Cliente</h2>
+    
+    <form action="/clientes/editar/{{ cliente.id }}" method="POST" class="form-grid">
+        <div class="detail-box">
+            <label>Nome:</label> <input type="text" name="nome" value="{{ cliente.nome }}">
+            <label>CPF:</label> <input type="text" name="cpf" data-mask="cpf" value="{{ cliente.cpf }}">
+            <label>RG:</label> <input type="text" name="rg" data-mask="rg" value="{{ cliente.rg }}">
+            <label>Nascimento:</label> <input type="text" name="data" data-mask="data" value="{{ cliente.data_nascimento }}">
+            <label>E-mail:</label> <input type="email" name="email" value="{{ cliente.email }}">
+            <label>Celular:</label> <input type="text" name="celular" data-mask="cel" value="{{ cliente.celular }}">
+            </div>
+
+        <div class="action-footer">
+            <button type="submit" class="btn-save">Salvar Alterações</button>
+            <a href="/clientes" class="btn-back">Voltar</a>
+        </div>
+    </form>
+</div>

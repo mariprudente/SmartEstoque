@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fa fa-users-gear"></i> Gerenciar Usuários</h2>
+    <table class="table-estoque">
+        <thead>
+            <tr>
+                <th>Nome Completo</th>
+                <th>Login</th>
+                <th>Função</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.nome_completo }}</td>
+                <td>{{ u.username }}</td>
+                <td><span class="tag-origem tag-produto">{{ u.funcao }}</span></td>
+                <td>
+                    <a href="{{ url_for('visualizar_usuario', id=u.id) }}" class="btn-icon blue"><i class="fa fa-eye"></i> Visualizar</a>
+                    <a href="{{ url_for('excluir_usuario', id=u.id) }}" class="btn-icon red" onclick="return confirm('Excluir este usuário?')"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{{ url_for('configuracoes') }}" class="btn-main" style="background: #95a5a6;">Voltar</a>
+</div>
+{% endblock %}

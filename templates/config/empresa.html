@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fa fa-building"></i> Dados da Empresa</h2>
+    <div class="card-box">
+        <form action="{{ url_for('salvar_dados_empresa') }}" method="POST" class="form-grid">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Razão Social:</label>
+                <input type="text" name="razao_social" value="{{ empresa.razao_social }}" class="input-full" required>
+            </div>
+            <div class="form-group">
+                <label>Nome Fantasia:</label>
+                <input type="text" name="nome_fantasia" value="{{ empresa.nome_fantasia }}" class="input-full">
+            </div>
+            <div class="form-group">
+                <label>CNPJ:</label>
+                <input type="text" name="cnpj" value="{{ empresa.cnpj }}" placeholder="00.000.000/0000-00" class="input-full">
+            </div>
+            <div class="form-group">
+                <label>Telefone/Celular:</label>
+                <input type="text" name="telefone" value="{{ empresa.telefone }}" placeholder="(00) 00000-0000" class="input-full">
+            </div>
+            
+            <div style="grid-column: span 2; margin-top: 20px;">
+                <button type="submit" class="btn-save">Salvar Dados da Empresa</button>
+                <a href="{{ url_for('configuracoes') }}" class="btn-main" style="background: #95a5a6;">Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

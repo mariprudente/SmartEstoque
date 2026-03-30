@@ -1,62 +1,64 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
 
-<head>
+{% block content %}
+    <h1>Bem-vindo!</h1>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <div class="cards">
+        <a class="card cliente" href="{{ url_for('clientes') }}">
+            <i class="fa fa-users"></i> Clientes
+        </a>
+        <a class="card fornecedor" href="{{ url_for('fornecedores') }}">
+            <i class="fa fa-truck"></i> Fornecedores
+        </a>
+        <a class="card produto" href="{{ url_for('produtos') }}">
+            <i class="fa fa-box"></i> Produtos
+        </a>
+        <a class="card mov" href="{{ url_for('movimentacao') }}">
+            <i class="fa fa-rotate"></i> Movimentação
+        </a>
+        <a class="card caixa" href="{{ url_for('caixa') }}">
+            <i class="fa fa-sack-dollar"></i> Caixa
+        </a>
+        <a class="card relatorio" href="{{ url_for('estoque') }}">
+            <i class="fa fa-chart-column"></i> Relatórios
+        </a>
+    </div>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Mantenha o CSS específico dos cards aqui */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
 
-</head>
+        .card {
+            height: 180px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 22px;
+            text-decoration: none;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-<body>
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+        }
 
-<div class="container">
+        .card i { font-size: 50px; margin-bottom: 15px; }
 
-{% include 'menu.html' %}
-
-<div class="content">
-
-<h1>Bem-vindo!</h1>
-
-<div class="cards">
-
-<a class="card produto" href="/produtos">
-<i class="fa fa-box"></i>
-Produtos
-</a>
-
-<a class="card mov" href="/movimentacao">
-<i class="fa fa-rotate"></i>
-Movimentação
-</a>
-
-<a class="card cliente" href="/clientes">
-<i class="fa fa-users"></i>
-Clientes
-</a>
-
-<a class="card fornecedor" href="/fornecedores">
-<i class="fa fa-truck"></i>
-Fornecedores
-</a>
-
-<a class="card caixa" href="/caixa">
-<i class="fa fa-sack-dollar"></i>
-Caixa
-</a>
-
-<a class="card relatorio" href="/relatorios">
-<i class="fa fa-chart-column"></i>
-Relatórios
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</body>
-</html>
+        /* Cores em Degradê */
+        .produto { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .mov { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .cliente { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .fornecedor { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .caixa { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .relatorio { background: linear-gradient(135deg, #3498db, #5dade2); }
+    </style>
+{% endblock %}

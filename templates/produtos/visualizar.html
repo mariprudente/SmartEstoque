@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Produto - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container" style="display: flex;">
+        {% include 'layout/menu.html' %}
+
+        <div class="content" style="flex: 1; padding: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h1><i class="fas fa-box"></i> Produto: {{ produto.nome }}</h1>
+                <a href="{{ url_for('produtos') }}" class="btn-action blue">Voltar</a>
+            </div>
+
+            <div class="card-box" style="padding: 30px; background: white; border-radius: 12px;">
+                <div class="form-grid">
+                    <div class="input-group"><strong>Marca:</strong> <p>{{ produto.marca or 'N/A' }}</p></div>
+                    <div class="input-group"><strong>Preço de Venda:</strong> <p>R$ {{ "%.2f"|format(produto.preco_venda) }}</p></div>
+                    <div class="input-group"><strong>Estoque Atual:</strong> <p>{{ produto.estoque_atual }}</p></div>
+                    <div class="input-group"><strong>Situação:</strong> 
+                        <p>{{ 'Ativo' if produto.situacao else 'Inativo' }}</p>
+                    </div>
+                    
+                    <div class="full">
+                        <strong>Fornecedor:</strong>
+                        <p>{{ produto.fornecedor.razao_social if produto.fornecedor else 'Não informado' }}</p>
+                    </div>
+
+                    <div class="full">
+                        <strong>Observações:</strong>
+                        <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60;">
+                            {{ produto.observacoes or 'Sem observações.' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: right;">
+                    <a href="{{ url_for('editar_produto', id=produto.id) }}" class="btn-action orange">Editar Produto</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

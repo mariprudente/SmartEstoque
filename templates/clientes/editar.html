@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+    <div class="main-container" style="display: flex; min-height: 100vh;">
+        {% include 'layout/menu.html' %}
+
+        <div class="content" style="flex: 1; padding: 40px; background-color: #f8f9fa;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h1><i class="fas fa-edit" style="color: #e67e22;"></i> Editando: {{ cliente.nome }}</h1>
+                <a href="{{ url_for('clientes') }}" class="btn-action blue" style="text-decoration: none;">Cancelar</a>
+            </div>
+
+            <div class="card-box" style="border-radius: 20px;">
+                <form action="{{ url_for('atualizar_cliente', id=cliente.id) }}" method="POST" class="form-grid">
+                    <div class="input-group full">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" value="{{ cliente.nome }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" class="cpf" value="{{ cliente.cpf }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>RG</label>
+                        <input type="text" name="rg" class="rg" value="{{ cliente.rg }}">
+                    </div>
+                    <div class="input-group">
+                        <label>Data de Nascimento</label>
+                        <input type="text" name="data_nascimento" class="date" value="{{ cliente.data_nascimento }}">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ cliente.email }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone" class="phone" value="{{ cliente.telefone }}">
+                    </div>
+                    <div class="input-group">
+                        <label>Celular</label>
+                        <input type="text" name="celular" class="sp_celphones" value="{{ cliente.celular }}">
+                    </div>
+                    
+                    <div class="full" style="text-align: right; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                        <button type="submit" class="btn-action green">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('.cpf').mask('000.000.000-00');
+            $('.rg').mask('00.000.000-0');
+            $('.date').mask('00/00/0000');
+            $('.phone').mask('(00) 0000-0000');
+            $('.sp_celphones').mask('(00) 00000-0000');
+        });
+    </script>
+</body>
+</html>
