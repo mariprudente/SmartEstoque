@@ -104,6 +104,9 @@
 <label>Preço de Venda</label>
 <input type="text" name="preco_venda">
 
+<label>Estoque Inicial</label>
+<input type="number" name="estoque" value="0">
+
 <br><br>
 <label>Observações</label>
 
@@ -118,8 +121,6 @@
 
 </div>
 
-
-<!-- ABA CONSULTA -->
 
 <div id="consulta" class="tabcontent" style="display:none">
 
@@ -138,7 +139,7 @@
 <table class="tabela-clientes">
 
 <tr>
-
+<th>Foto</th>
 <th>Produto</th>
 <th>Código</th>
 <th>Preço</th>
@@ -153,11 +154,15 @@
 
 <tr>
 
+    <td>
+            <img src="{{ url_for('static', filename='img/' + (produto.foto or 'sem-imagem.png')) }}" width="50" style="border-radius: 5px;">
+    </td>
+
 <td>{{ produto.nome }}</td>
 
 <td>{{ produto.codigo }}</td>
 
-<td>R$ {{ produto.preco_venda }}</td>
+<td>R$ {{ "%.2f"|format(produto.preco_venda) }}</td>
 
 <td>{{ produto.fornecedor.razao_social }}</td>
 

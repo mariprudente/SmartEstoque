@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Produto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2>Editar Produto: {{ produto.nome }}</h2>
+
+            <form action="/atualizar_produto/{{ produto.id }}" method="POST">
+                
+                <label>Nome do Produto</label>
+                <input type="text" name="nome" value="{{ produto.nome }}" required>
+
+                <label>Marca</label>
+                <input type="text" name="marca" value="{{ produto.marca }}">
+
+                <label>Código</label>
+                <input type="text" name="codigo" value="{{ produto.codigo }}">
+
+                <label>Preço de Compra</label>
+                <input type="text" name="preco_compra" value="{{ produto.preco_compra }}">
+
+                <label>Preço de Venda</label>
+                <input type="text" name="preco_venda" value="{{ produto.preco_venda }}">
+
+                <label>Estoque Atual</label>
+                <input type="number" name="estoque" value="{{ produto.estoque }}">
+
+                <label>Fornecedor</label>
+                <select name="fornecedor">
+                    {% for f in fornecedores %}
+                        <option value="{{ f.id }}" {% if f.id == produto.fornecedor_id %}selected{% endif %}>
+                            {{ f.razao_social }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>Observações</label>
+                <textarea name="observacoes">{{ produto.observacoes }}</textarea>
+
+                <div class="botoes">
+                    <button type="submit" class="btn-salvar">Salvar Alterações</button>
+                    <a href="/produtos" class="btn-cancelar">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

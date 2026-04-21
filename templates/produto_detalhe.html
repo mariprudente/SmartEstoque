@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Produto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2>Detalhes do Produto</h2>
+            <div class="card-detalhe">
+                <div class="info-principal">
+                    
+                    <p><strong>Nome:</strong> {{ produto.nome }}</p>
+                    <p><strong>Código:</strong> {{ produto.codigo }}</p>
+                    <p><strong>Marca:</strong> {{ produto.marca }}</p>
+                </div>
+                
+                <hr>
+                
+                <div class="info-valores">
+                    <p><strong>Preço de Venda:</strong> R$ {{ "%.2f"|format(produto.preco_venda) }}</p>
+                    <p><strong>Estoque Atual:</strong> {{ produto.estoque }} unidades</p>
+                    <p><strong>Fornecedor:</strong> {{ produto.fornecedor.razao_social }}</p>
+                </div>
+
+                <div class="info-obs">
+                    <p><strong>Observações:</strong> {{ produto.observacoes or 'Nenhuma observação.' }}</p>
+                </div>
+
+                <br>
+                <a href="/produtos" class="btn-voltar">⬅ Voltar para Lista</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
