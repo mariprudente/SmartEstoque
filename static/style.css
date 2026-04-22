@@ -124,7 +124,15 @@ width:100%;
 border-collapse:collapse;
 margin-top:20px;
 background:white;
+table-layout: auto;
 
+}
+
+.tabela-clientes th, .tabela-clientes td {
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle; /* O SEGREDO: Alinha tudo no centro da altura da linha */
+    border-bottom: 1px solid #ddd;
 }
 
 .tabela-clientes th{
@@ -132,6 +140,7 @@ background:white;
 background:#2e6ed8;
 color:white;
 padding:10px;
+vertical-align: middle;
 
 }
 
@@ -139,13 +148,49 @@ padding:10px;
 
 padding:10px;
 border-bottom:1px solid #ddd;
+vertical-align: middle;
 
+}
+
+.tabela-clientes td:first-child {
+
+    width: 65px;
+    text-align: center;
+}
+.tabela-clientes img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
 }
 
 .tabela-clientes tr:hover{
 
 background:#f2f2f2;
 
+}
+
+.estoque-baixo {
+ 
+    background-color: #fff1f0 !important; /* Vermelho bem clarinho de fundo */
+}
+
+.estoque-baixo td {
+ 
+    color: #b91c1c; /* Texto em tom de alerta */
+}
+
+.badge-alerta {
+ 
+    background: #f8d7da;
+    color: #721c24;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    border: 1px solid #f5c6cb;
+    margin-left: 5px;
 }
 
 .btn-detalhe{

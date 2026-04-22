@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -53,6 +53,7 @@ class Fornecedor(db.Model):
     celular = db.Column(db.String(20))
     email = db.Column(db.String(120))
     observacoes = db.Column(db.Text)
+    ativo = db.Column(db.Boolean, default=True)
 
 class Produto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,10 +132,15 @@ def excluir_cliente(id):
 @app.route('/fornecedores')
 def fornecedores():
     busca = request.args.get("busca")
+    
     if busca:
-        fornecedores = Fornecedor.query.filter(Fornecedor.razao_social.contains(busca)).all()
+        fornecedores = Fornecedor.query.filter(
+            Fornecedor.razao_social.contains(busca), 
+            Fornecedor.ativo == True 
+        ).all()
     else:
-        fornecedores = Fornecedor.query.all()
+        fornecedores = Fornecedor.query.filter_by(ativo=True).all()
+        
     return render_template("fornecedores.html", fornecedores=fornecedores)
 
 @app.route('/salvar_fornecedor', methods=['POST'])
@@ -161,10 +167,11 @@ def salvar_fornecedor():
 
 @app.route('/excluir_fornecedor/<int:id>')
 def excluir_fornecedor(id):
-    fornecedor = Fornecedor.query.get(id)
-    db.session.delete(fornecedor)
-    db.session.commit()
-    return redirect('/fornecedores')
+    fornecedor = db.session.get(Fornecedor, id)
+    if fornecedor:
+        fornecedor.ativo = False 
+        db.session.commit()
+    return redirect(url_for('fornecedores'))
 
 @app.route('/fornecedor/<int:id>')
 def fornecedor_detalhe(id):
@@ -173,13 +180,18 @@ def fornecedor_detalhe(id):
 
 @app.route('/produtos')
 def produtos():
-    produtos = Produto.query.all()
+    busca = request.args.get("busca")
+    if busca:
+        produtos = Produto.query.filter(Produto.nome.contains(busca)).all()
+    else:
+        produtos = Produto.query.all()
+    
     fornecedores = Fornecedor.query.all()
+    
     return render_template("produtos.html", produtos=produtos, fornecedores=fornecedores)
 
 @app.route('/salvar_produto', methods=['POST'])
 def salvar_produto():
-    # Coleta os dados usando .get() para evitar erros caso algum campo venha vazio
     
     nome = request.form.get('nome')
     marca = request.form.get('marca')
