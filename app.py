@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from sqlalchemy import func
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -22,6 +23,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # =====================================
 # MODELS (Estrutura das Tabelas)
 # =====================================
+
+class Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False) # Senha criptografada!
+    role = db.Column(db.String(20), default='vendedor') # 'admin', 'estoque', 'vendedor'
 
 class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -462,7 +469,61 @@ def finalizar_venda():
         print(f"Erro na venda casada: {e}")
         return "Erro ao processar a venda.", 500
 
+@app.route('/relatorios')
+def dashboard():
+    # 1. Primeiro definimos as variáveis base com valor zero
+    faturamento_total = 0
+    investimento_estoque = 0
 
+    # 2. Buscamos os valores reais no banco
+    faturamento_total = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'entrada').scalar() or 0
+    investimento_estoque = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'saida').scalar() or 0
+    
+    # 3. Agora calculamos o lucro (as variáveis acima já existem com certeza)
+    lucro_real = faturamento_total - investimento_estoque
+
+    # 4. Cálculo do Ticket Médio
+    total_vendas_count = db.session.query(func.count(Caixa.id)).filter(
+        Caixa.tipo == 'entrada', 
+        Caixa.descricao.like('Venda%')
+    ).scalar() or 0
+    
+    # Uso seguro:
+    ticket_medio = (faturamento_total / total_vendas_count) if total_vendas_count > 0 else 0
+
+    # 5. Dados para o Gráfico
+    mais_vendidos = db.session.query(
+        Produto.nome, 
+        func.sum(Movimentacao.quantidade)
+    ).join(Movimentacao).filter(Movimentacao.tipo == 'saida')\
+    .group_by(Produto.nome).order_by(func.sum(Movimentacao.quantidade).desc()).limit(5).all()
+
+    labels_produtos = [item[0] for item in mais_vendidos]
+    valores_produtos = [int(item[1]) for item in mais_vendidos]
+
+    # 6. Ranking de Margem
+    produtos_lista = Produto.query.all()
+    ranking_lucro = []
+    for p in produtos_lista:
+        ranking_lucro.append({
+            'nome': p.nome, 
+            'margem': (p.preco_venda or 0) - (p.preco_compra or 0)
+        })
+    
+    ranking_lucro = sorted(ranking_lucro, key=lambda x: x['margem'], reverse=True)[:5]
+
+    estoque_baixo = Produto.query.filter(Produto.estoque < 5).all()
+
+    return render_template("dashboard.html", 
+                           faturamento=faturamento_total,
+                           investimento=investimento_estoque,
+                           lucro_real=lucro_real,
+                           ticket_medio=ticket_medio,
+                           labels_produtos=labels_produtos,
+                           valores_produtos=valores_produtos,
+                           ranking_lucro=ranking_lucro,
+                           estoque_baixo=estoque_baixo,
+                           now=datetime.now())
 
 # =====================================
 # INICIAR SISTEMA
