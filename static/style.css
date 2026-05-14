@@ -372,3 +372,23 @@ opacity:0.6;
 #foto{
 display:none;
 }
+
+.aviso-custom {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #d32f2f; /* Vermelho elegante */
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 9999;
+    display: none; /* Escondido por padrão */
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from { top: -100px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}

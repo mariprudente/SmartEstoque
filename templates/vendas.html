@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <title>Realizar Venda - Smart Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
+    <div id="msg-erro" class="aviso-custom"></div>
     <div class="container">
         {% include 'menu.html' %}
         
@@ -13,7 +15,7 @@
             <h2>🛒 Realizar Nova Venda</h2>
             
         <div class="form-box" style="max-width: 500px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #2e7d32;">
-    <form action="/finalizar_venda" method="POST">
+        <form action="/finalizar_venda" method="POST">
         
         <h3 style="text-align: center; color: #333; margin-bottom: 25px;">Dados da Venda</h3>
 
@@ -23,31 +25,20 @@
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-    <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Cliente</label>
-    <select name="cliente_id" required 
-            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s;"
-            onfocus="this.style.borderColor='#2e7d32'">
-        <option value="">-- Selecione o Cliente --</option>
-        {% for cliente in clientes %}
-        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-        {% endfor %}
-    </select>
-</div>
-
-<div class="form-group" style="margin-bottom: 20px;">
-    <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Produto</label>
-    <select name="produto_id" id="produto_select" onchange="atualizarTudo()" required 
-            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
-        <option value="" data-foto="sem-imagem.png" data-preco="0">-- Selecione o Produto --</option>
-        {% for produto in produtos %}
-        <option value="{{ produto.id }}" 
-                data-foto="{{ produto.foto or 'sem-imagem.png' }}" 
-                data-preco="{{ produto.preco_venda }}">
-            {{ produto.nome }} (Disponível: {{ produto.estoque }})
-        </option>
-        {% endfor %}
-    </select>
-</div>
+            <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Produto</label>
+<select name="produto_id" id="produto_select" onchange="atualizarTudo()" 
+        style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+    <option value="" data-foto="sem-imagem.png" data-preco="0" data-nome="" data-estoque="0">-- Selecione --</option>
+    {% for produto in produtos %}
+    <option value="{{ produto.id }}" 
+            data-nome="{{ produto.nome }}"
+            data-foto="{{ produto.foto or 'sem-imagem.png' }}" 
+            data-preco="{{ produto.preco_venda }}"
+            data-estoque="{{ produto.estoque }}"> {{ produto.nome }} (Disponível: {{ produto.estoque }})
+    </option>
+    {% endfor %}
+</select>
+        </div>
 
         <div style="display: flex; gap: 15px; margin-bottom: 20px;">
             <div style="flex: 1;">
@@ -75,6 +66,30 @@
                 <option value="Dinheiro">💵 Dinheiro</option>
             </select>
         </div>
+<div style="margin-bottom: 20px;">
+            <button type="button" onclick="adicionarItemLista()" style="width: 100%; padding: 10px; background: #1976d2; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                <i class="fa fa-plus"></i> ADICIONAR AO PEDIDO
+            </button>
+        </div>
+
+        <div id="lista-venda" style="margin-top: 20px; display: none;">
+            <h4 style="color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;">Itens do Pedido:</h4>
+            <table style="width: 100%; font-size: 13px; margin-bottom: 15px;" id="tabela-itens">
+                <thead>
+                    <tr style="text-align: left; color: #666;">
+                        <th>Produto</th>
+                        <th>Qtd</th>
+                        <th>Subtotal</th>
+                        <th style="text-align: center;">#</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela">
+                    </tbody>
+            </table>
+            <div style="text-align: right; font-weight: bold; color: #2e7d32; margin-bottom: 15px;">
+                Total Geral: <span id="total-venda-casada">R$ 0,00</span>
+            </div>
+        </div>
 
         <button type="submit" class="btn-salvar" style="width: 100%; padding: 15px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer;">
             FINALIZAR VENDA
@@ -82,17 +97,110 @@
     </form>
 </div>
 
+
+
+
+
+
+
+
+
 <script>
-function atualizarTudo() {
+let totalGeralPedido = 0;
+
+// Função Profissional de Aviso
+function mostrarErro(mensagem) {
+    const box = document.getElementById('msg-erro');
+    box.innerText = mensagem;
+    box.style.display = 'block';
+
+    setTimeout(() => {
+        box.style.display = 'none';
+    }, 3000);
+}
+
+function adicionarItemLista() {
     const select = document.getElementById('produto_select');
     const option = select.options[select.selectedIndex];
     
+    if (!option.value) return mostrarErro("⚠️ Selecione um produto!");
+
+    const id = option.value;
+    const nome = option.getAttribute('data-nome');
+    const preco = parseFloat(option.getAttribute('data-preco')) || 0;
+    const qtd = parseInt(document.getElementById('qtd_venda').value) || 0;
+    
+    // PEGA O ESTOQUE DO ATRIBUTO QUE ADICIONAMOS NO HTML
+    const estoqueDisponivel = parseInt(option.getAttribute('data-estoque')) || 0;
+
+    // VALIDAÇÃO DE ESTOQUE
+    if (qtd > estoqueDisponivel) {
+        return mostrarErro(`❌ Estoque insuficiente! Apenas ${estoqueDisponivel} unidades disponíveis.`);
+    }
+
+    if (qtd <= 0) return mostrarErro("⚠️ Informe uma quantidade válida!");
+
+    const subtotal = preco * qtd;
+    document.getElementById('lista-venda').style.display = 'block';
+
+    const tbody = document.getElementById('corpo-tabela');
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = "1px solid #eee";
+    
+    tr.innerHTML = `
+        <td>${nome}<input type="hidden" name="produto_id[]" value="${id}"></td>
+        <td style="text-align: center;">${qtd}<input type="hidden" name="quantidade[]" value="${qtd}"></td>
+        <td>R$ ${subtotal.toFixed(2)}</td>
+        <td style="text-align: center;">
+            <button type="button" onclick="removerItem(this, ${subtotal})" style="background:none; border:none; color:#d32f2f; cursor:pointer;">
+                <i class="fa fa-trash"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+
+    totalGeralPedido += subtotal;
+    document.getElementById('total-venda-casada').innerText = "R$ " + totalGeralPedido.toFixed(2).replace('.', ',');
+
+    // Limpar campos após adicionar
+    select.value = "";
+    document.getElementById('qtd_venda').value = "1";
+    document.getElementById('foto-venda').src = "/static/img/sem-imagem.png";
+    document.getElementById('preco_unitario').value = "R$ 0,00";
+    document.getElementById('total_exibicao').innerText = "R$ 0,00";
+}
+
+function removerItem(botao, valor) {
+    const linha = botao.closest('tr');
+    linha.remove();
+    
+    totalGeralPedido -= valor;
+    if (totalGeralPedido < 0) totalGeralPedido = 0;
+    document.getElementById('total-venda-casada').innerText = "R$ " + totalGeralPedido.toFixed(2).replace('.', ',');
+    
+    if (document.getElementById('corpo-tabela').children.length === 0) {
+        document.getElementById('lista-venda').style.display = 'none';
+        totalGeralPedido = 0; 
+    }
+}
+
+// VALIDAÇÃO AO FINALIZAR (Sempre fora das outras funções)
+document.querySelector('form').onsubmit = function(e) {
+    const tbody = document.getElementById('corpo-tabela');
+    if (tbody.children.length === 0) {
+        mostrarErro("⚠️ O carrinho está vazio! Adicione produtos antes de finalizar.");
+        e.preventDefault();
+        return false;
+    }
+};
+
+function atualizarTudo() {
+    const select = document.getElementById('produto_select');
+    const option = select.options[select.selectedIndex];
     const fotoNome = option.getAttribute('data-foto');
     document.getElementById('foto-venda').src = "/static/img/" + (fotoNome || 'sem-imagem.png');
-    
     const preco = parseFloat(option.getAttribute('data-preco')) || 0;
     document.getElementById('preco_unitario').value = "R$ " + preco.toFixed(2).replace('.', ',');
-    
     calcularTotal();
 }
 
@@ -101,7 +209,6 @@ function calcularTotal() {
     const option = select.options[select.selectedIndex];
     const qtd = document.getElementById('qtd_venda').value || 0;
     const preco = parseFloat(option.getAttribute('data-preco')) || 0;
-    
     const total = preco * qtd;
     document.getElementById('total_exibicao').innerText = "R$ " + total.toFixed(2).replace('.', ',');
 }

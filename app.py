@@ -179,7 +179,7 @@ def fornecedores():
 
 @app.route('/salvar_fornecedor', methods=['POST'])
 def salvar_fornecedor():
-    # Usando .get() para evitar o erro BadRequestKeyError
+    
     fornecedor = Fornecedor(
         razao_social=request.form.get('razao_social'),
         cnpj=request.form.get('cnpj'),
@@ -187,7 +187,7 @@ def salvar_fornecedor():
         cep=request.form.get('cep'),
         endereco=request.form.get('endereco'),
         numero=request.form.get('numero'),
-        complemento=request.form.get('complemento'), # Agora não vai mais travar aqui!
+        complemento=request.form.get('complemento'), 
         bairro=request.form.get('bairro'),
         cidade=request.form.get('cidade'),
         uf=request.form.get('uf'),
@@ -195,7 +195,7 @@ def salvar_fornecedor():
         celular=request.form.get('celular'),
         email=request.form.get('email'),
         observacoes=request.form.get('observacoes'),
-        ativo=True # Garante que ele comece como ativo
+        ativo=True 
     )
     
     try:
@@ -320,6 +320,7 @@ def editar_produto(id):
     produto = db.session.get(Produto, id)
     fornecedores = Fornecedor.query.all()
     return render_template("editar_produto.html", produto=produto, fornecedores=fornecedores)
+
 @app.route('/estoque')
 def estoque():
     produtos = Produto.query.all()
@@ -335,27 +336,30 @@ def movimentar_estoque():
     
     produto = db.session.get(Produto, id_p)
     
+    if not produto:
+        return "Erro: Produto não encontrado.", 404
+
     if tipo == 'entrada':
         produto.estoque += qtd
-        # Ajustado de preco_custo para preco_compra conforme seu model
-        valor_total = produto.preco_compra * qtd 
+        
+        valor_total_custo = produto.preco_compra * qtd 
         
         novo_gasto = Caixa(
             descricao=f"Compra de estoque: {produto.nome} (x{qtd})",
-            tipo='saida',
-            valor=valor_total,
+            tipo='saida', 
+            valor=valor_total_custo,
             data=datetime.now()
         )
         db.session.add(novo_gasto)
-        msg_obs = f"Compra: {obs}" if obs else "Entrada de mercadoria"
+        msg_obs = f"Compra: {obs}" if obs else "Entrada de mercadoria (Custo Fornecedor)"
         
-    else: # Saída
+    else: 
         if produto.estoque < qtd:
             return "Erro: Quantidade de saída maior que o estoque atual.", 400
+        
         produto.estoque -= qtd
         msg_obs = f"Ajuste/Perda: {obs}" if obs else "Saída manual"
 
-    # Registra no histórico de movimentações (usando produto_id conforme seu model)
     nova_mov = Movimentacao(
         produto_id=id_p,
         tipo=tipo,
@@ -411,45 +415,52 @@ def vendas():
 
 @app.route('/finalizar_venda', methods=['POST'])
 def finalizar_venda():
-    p_id = request.form.get('produto_id')
-    qtd_solicitada = int(request.form.get('quantidade'))
+    p_ids = request.form.getlist('produto_id[]')
+    quantidades = request.form.getlist('quantidade[]')
     
-    produto = db.session.get(Produto, p_id)
-    
-    if produto.estoque < qtd_solicitada:
-        return f"Estoque insuficiente! O produto {produto.nome} possui apenas {produto.estoque} unidades."
+    if not p_ids:
+        return "Erro: Nenhum produto selecionado.", 400
 
-    # 1. Baixa o estoque do produto
-    produto.estoque -= qtd_solicitada
-    
-    # 2. Registra o financeiro no Caixa
-    valor_venda = produto.preco_venda * qtd_solicitada
-    novo_lancamento = Caixa(
-        descricao=f"Venda: {produto.nome} (x{qtd_solicitada})",
-        tipo='entrada',
-        valor=valor_venda,
-        data=datetime.now()
-    )
-    db.session.add(novo_lancamento)
-
-    # 3. REGISTRA NO HISTÓRICO DE ESTOQUE (Nome de campo corrigido)
-    nova_movimentacao = Movimentacao(
-        produto_id=p_id, # Usando o nome correto que está na sua classe Movimentacao
-        tipo='saida',
-        quantidade=qtd_solicitada,
-        observacao=f"Venda efetuada via sistema",
-        # Convertendo para String pois seu modelo usa db.String(20)
-        data=datetime.now().strftime('%d/%m/%Y %H:%M') 
-    )
-    db.session.add(nova_movimentacao)
+    valor_total_venda = 0
+    itens_descritos = []
 
     try:
+        for p_id, qtd in zip(p_ids, quantidades):
+            qtd = int(qtd)
+            produto = db.session.get(Produto, p_id)
+            
+            if produto.estoque < qtd:
+                db.session.rollback()
+                return f"Estoque insuficiente para {produto.nome}!"
+
+            produto.estoque -= qtd
+            valor_item = produto.preco_venda * qtd
+            valor_total_venda += valor_item
+            itens_descritos.append(f"{produto.nome} (x{qtd})")
+            nova_mov = Movimentacao(
+                produto_id=p_id,
+                tipo='saida',
+                quantidade=qtd,
+                observacao="Venda Casada",
+                data=datetime.now().strftime('%d/%m/%Y %H:%M')
+            )
+            db.session.add(nova_mov)
+
+        novo_caixa = Caixa(
+            descricao=f"Venda: {', '.join(itens_descritos)}",
+            tipo='entrada',
+            valor=valor_total_venda,
+            data=datetime.now()
+        )
+        db.session.add(novo_caixa)
+        
         db.session.commit()
         return redirect(url_for('caixa'))
+
     except Exception as e:
         db.session.rollback()
-        print(f"Erro ao salvar: {e}")
-        return "Erro ao processar a venda no banco de dados.", 500
+        print(f"Erro na venda casada: {e}")
+        return "Erro ao processar a venda.", 500
 
 
 
