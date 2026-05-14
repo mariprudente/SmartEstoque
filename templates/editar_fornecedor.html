@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Fornecedor - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">🏢 Editar Cadastro de Fornecedor</h2>
+
+            <div class="form-box" style="max-width: 850px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #7B5FB3;">
+                
+                <h3 style="text-align: center; color: #333; margin-bottom: 30px;">Alterar Dados de: {{ fornecedor.razao_social }}</h3>
+
+                <form action="/atualizar_fornecedor/{{ fornecedor.id }}" method="POST">
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #1976d2; margin-bottom: 15px;">Dados Empresariais</h4>
+                        <div style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 15px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Razão Social</label>
+                                <input type="text" name="razao_social" value="{{ fornecedor.razao_social }}" required style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">CNPJ</label>
+                                <input type="text" id="cnpj" name="cnpj" value="{{ fornecedor.cnpj }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Inscrição Estadual</label>
+                                <input type="text" name="inscricao_estadual" value="{{ fornecedor.inscricao_estadual }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #ffa000; margin-bottom: 15px;">Endereço e Localização</h4>
+                        <div style="display: grid; grid-template-columns: 3fr 1fr 2fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Rua/Logradouro</label>
+                                <input type="text" name="rua" value="{{ fornecedor.rua }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Nº</label>
+                                <input type="text" name="numero" value="{{ fornecedor.numero }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Cidade</label>
+                                <input type="text" name="cidade" value="{{ fornecedor.cidade }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">UF</label>
+                                <input type="text" name="estado" value="{{ fornecedor.estado }}" maxlength="2" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #2e7d32; margin-bottom: 15px;">Canais de Contato</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 15px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Telefone Fixo</label>
+                                <input type="text" id="telefone" name="telefone" value="{{ fornecedor.telefone }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Vendedor / Celular</label>
+                                <input type="text" id="celular" name="celular" value="{{ fornecedor.celular }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">E-mail Corporativo</label>
+                                <input type="email" name="email" value="{{ fornecedor.email }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button type="submit" style="flex: 2; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                            <i class="fa fa-save"></i> ATUALIZAR FORNECEDOR
+                        </button>
+                        <a href="/fornecedores" style="flex: 1; padding: 15px; background: #6c757d; color: white; border-radius: 10px; text-decoration: none; text-align: center; font-weight: bold; line-height: 1.5;">CANCELAR</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function(){
+        $('#cnpj').mask('00.000.000/0000-00');
+        $('#telefone').mask('(00) 0000-0000');
+        $('#celular').mask('(00) 00000-0000');
+    });
+    </script>
+</body>
+</html>

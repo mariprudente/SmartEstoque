@@ -1,59 +1,67 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-br">
 <head>
-
-<meta charset="UTF-8">
-<title>Detalhes do Cliente</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Detalhes do Cliente - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-
 <body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">📄 Ficha do Cliente</h2>
 
-<div class="container">
+            <div class="card-detalhe" style="max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 5px solid #4CAF50;">
+                
+                <div style="background: #f8f9fa; padding: 30px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 20px;">
+                    <div style="width: 80px; height: 80px; background: #1976d2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px;">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: #333; font-size: 24px;">{{ cliente.nome }}</h3>
+                        <span style="color: #666; font-size: 14px;">Cliente ID: #{{ cliente.id }}</span>
+                    </div>
+                </div>
 
-{% include 'menu.html' %}
+                <div style="padding: 30px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        
+                        <div>
+                            <h4 style="border-bottom: 2px solid #1976d2; padding-bottom: 8px; color: #1976d2; margin-bottom: 15px;"><i class="fa fa-id-card"></i> Dados Pessoais</h4>
+                            <p style="margin-bottom: 10px;"><strong>CPF:</strong> <span style="color: #555;">{{ cliente.cpf }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>RG:</strong> <span style="color: #555;">{{ cliente.rg }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>Data de Nascimento:</strong> <span style="color: #555;">{{ cliente.nascimento }}</span></p>
+                        </div>
 
-<div class="content">
+                        <div>
+                            <h4 style="border-bottom: 2px solid #2e7d32; padding-bottom: 8px; color: #2e7d32; margin-bottom: 15px;"><i class="fa fa-phone"></i> Contato</h4>
+                            <p style="margin-bottom: 10px;"><strong>Celular:</strong> <span style="color: #555;">{{ cliente.celular }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>Telefone:</strong> <span style="color: #555;">{{ cliente.telefone or 'Não informado' }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>E-mail:</strong> <span style="color: #1976d2; text-decoration: underline;">{{ cliente.email }}</span></p>
+                        </div>
+                    </div>
 
-<h2>Detalhes do Cliente</h2>
+                    <div style="margin-top: 30px; background: #f9f9f9; padding: 20px; border-radius: 10px; border-left: 5px solid #ffa000;">
+                        <h4 style="color: #333; margin-bottom: 10px;"><i class="fa fa-map-marker"></i> Endereço Completo</h4>
+                        <p style="margin: 0; color: #555; line-height: 1.6;">
+                            {{ cliente.rua }}, Nº {{ cliente.numero }} <br>
+                            {{ cliente.cidade }} - {{ cliente.estado }}
+                        </p>
+                    </div>
 
-<div class="form-box">
-
-<p><b>Nome:</b> {{ cliente.nome }}</p>
-
-<p><b>CPF:</b> {{ cliente.cpf }}</p>
-
-<p><b>RG:</b> {{ cliente.rg }}</p>
-
-<p><b>Nascimento:</b> {{ cliente.nascimento }}</p>
-
-<p><b>Rua:</b> {{ cliente.rua }}</p>
-
-<p><b>Número:</b> {{ cliente.numero }}</p>
-
-<p><b>Cidade:</b> {{ cliente.cidade }}</p>
-
-<p><b>Estado:</b> {{ cliente.estado }}</p>
-
-<p><b>Telefone:</b> {{ cliente.telefone }}</p>
-
-<p><b>Celular:</b> {{ cliente.celular }}</p>
-
-<p><b>Email:</b> {{ cliente.email }}</p>
-
-<br>
-
-<a href="/clientes">Voltar</a>
-
-</div>
-
-</div>
-
-</div>
-
+                    <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: flex-end;">
+                        <a href="/clientes" style="padding: 12px 25px; background: #6c757d; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                            <i class="fa fa-arrow-left"></i> VOLTAR
+                        </a>
+                        <a href="/editar_cliente/{{ cliente.id }}" style="padding: 12px 25px; background: #ffa000; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                            <i class="fa fa-edit"></i> EDITAR FICHA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
-
 </html>

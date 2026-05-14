@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Realizar Venda - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2>🛒 Realizar Nova Venda</h2>
+            
+        <div class="form-box" style="max-width: 500px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #2e7d32;">
+    <form action="/finalizar_venda" method="POST">
+        
+        <h3 style="text-align: center; color: #333; margin-bottom: 25px;">Dados da Venda</h3>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+            <img id="foto-venda" src="/static/img/sem-imagem.png" 
+                 style="width: 150px; height: 150px; object-fit: cover; border-radius: 12px; border: 3px solid #f8f9fa;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+    <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Cliente</label>
+    <select name="cliente_id" required 
+            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s;"
+            onfocus="this.style.borderColor='#2e7d32'">
+        <option value="">-- Selecione o Cliente --</option>
+        {% for cliente in clientes %}
+        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group" style="margin-bottom: 20px;">
+    <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Produto</label>
+    <select name="produto_id" id="produto_select" onchange="atualizarTudo()" required 
+            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+        <option value="" data-foto="sem-imagem.png" data-preco="0">-- Selecione o Produto --</option>
+        {% for produto in produtos %}
+        <option value="{{ produto.id }}" 
+                data-foto="{{ produto.foto or 'sem-imagem.png' }}" 
+                data-preco="{{ produto.preco_venda }}">
+            {{ produto.nome }} (Disponível: {{ produto.estoque }})
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Preço Unit.</label>
+                <input type="text" id="preco_unitario" readonly disabled value="R$ 0,00"
+                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; background: #f9f9f9; font-weight: bold; color: #2e7d32;">
+            </div>
+            <div style="flex: 1;">
+                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Quantidade</label>
+                <input type="number" name="quantidade" id="qtd_venda" min="1" value="1" oninput="calcularTotal()" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+            </div>
+        </div>
+
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 25px; text-align: center; border: 1px dashed #2e7d32;">
+            <span style="color: #555; font-weight: 600;">TOTAL DA VENDA</span>
+            <div id="total_exibicao" style="font-size: 28px; font-weight: 800; color: #2e7d32;">R$ 0,00</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 30px;">
+            <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Pagamento</label>
+            <select name="pagamento" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                <option value="Pix">⚡ Pix</option>
+                <option value="Cartão">💳 Cartão</option>
+                <option value="Dinheiro">💵 Dinheiro</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-salvar" style="width: 100%; padding: 15px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer;">
+            FINALIZAR VENDA
+        </button>
+    </form>
+</div>
+
+<script>
+function atualizarTudo() {
+    const select = document.getElementById('produto_select');
+    const option = select.options[select.selectedIndex];
+    
+    const fotoNome = option.getAttribute('data-foto');
+    document.getElementById('foto-venda').src = "/static/img/" + (fotoNome || 'sem-imagem.png');
+    
+    const preco = parseFloat(option.getAttribute('data-preco')) || 0;
+    document.getElementById('preco_unitario').value = "R$ " + preco.toFixed(2).replace('.', ',');
+    
+    calcularTotal();
+}
+
+function calcularTotal() {
+    const select = document.getElementById('produto_select');
+    const option = select.options[select.selectedIndex];
+    const qtd = document.getElementById('qtd_venda').value || 0;
+    const preco = parseFloat(option.getAttribute('data-preco')) || 0;
+    
+    const total = preco * qtd;
+    document.getElementById('total_exibicao').innerText = "R$ " + total.toFixed(2).replace('.', ',');
+}
+</script>
+
+        </div>
+    </div>
+</body>
+</html>

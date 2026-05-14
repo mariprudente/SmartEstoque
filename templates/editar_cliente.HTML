@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">📝 Editar Cadastro de Cliente</h2>
+
+            <div class="form-box" style="max-width: 850px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #4CAF50;">
+                
+                <h3 style="text-align: center; color: #333; margin-bottom: 30px;">Alterar Dados de: {{ cliente.nome }}</h3>
+
+                <form action="/atualizar_cliente/{{ cliente.id }}" method="POST">
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #1976d2; margin-bottom: 15px;">Informações Pessoais</h4>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px;">
+                            <div style="grid-column: span 1;">
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Nome Completo</label>
+                                <input type="text" name="nome" value="{{ cliente.nome }}" required style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">CPF</label>
+                                <input type="text" id="cpf" name="cpf" value="{{ cliente.cpf }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">RG</label>
+                                <input type="text" id="rg" name="rg" value="{{ cliente.rg }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Nascimento</label>
+                                <input type="text" id="nascimento" name="nascimento" value="{{ cliente.nascimento }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #ffa000; margin-bottom: 15px;">Endereço</h4>
+                        <div style="display: grid; grid-template-columns: 3fr 1fr 2fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Rua</label>
+                                <input type="text" name="rua" value="{{ cliente.rua }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Nº</label>
+                                <input type="text" name="numero" value="{{ cliente.numero }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Cidade</label>
+                                <input type="text" name="cidade" value="{{ cliente.cidade }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">UF</label>
+                                <input type="text" name="estado" value="{{ cliente.estado }}" maxlength="2" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 8px; color: #2e7d32; margin-bottom: 15px;">Contato</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 15px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Telefone</label>
+                                <input type="text" id="telefone" name="telefone" value="{{ cliente.telefone }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">Celular</label>
+                                <input type="text" id="celular" name="celular" value="{{ cliente.celular }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 5px;">E-mail</label>
+                                <input type="email" name="email" value="{{ cliente.email }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button type="submit" style="flex: 2; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s;">
+                            <i class="fa fa-save"></i> SALVAR ALTERAÇÕES
+                        </button>
+                        <a href="/clientes" style="flex: 1; padding: 15px; background: #6c757d; color: white; border-radius: 10px; text-decoration: none; text-align: center; font-weight: bold; line-height: 1.5; transition: 0.3s;">CANCELAR</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function(){
+        $('#cpf').mask('000.000.000-00');
+        $('#nascimento').mask('00/00/0000');
+        $('#telefone').mask('(00) 0000-0000');
+        $('#celular').mask('(00) 00000-0000');
+    });
+    </script>
+</body>
+</html>

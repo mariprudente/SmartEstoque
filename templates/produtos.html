@@ -1,229 +1,205 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-br">
 <head>
-
-<meta charset="UTF-8">
-
-<title>Produtos</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Produtos - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
+    <div class="container">
+        {% include 'menu.html' %}
 
-<div class="container">
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">📦 Gerenciamento de Produtos</h2>
 
-{% include 'menu.html' %}
+            <div class="tabs" style="margin-bottom: 0px; display: flex;">
+                <button id="defaultOpen" class="tablink" onclick="openTab(event, 'cadastro')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; transition: 0.3s;">Cadastro</button>
+                <button class="tablink" onclick="openTab(event, 'consulta')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; margin-left: 5px; transition: 0.3s;">Consulta</button>
+            </div>
 
-<div class="content">
-
-<h2>Produtos</h2>
+            
 
 
-<div class="tabs">
+            <div id="cadastro" class="tabcontent">
+                <div class="form-box" style="background: #ffffff; padding: 40px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #F57C00;">
+                    <h3 style="margin-bottom: 25px; color: #333;"><i class="fa fa-plus-circle"></i> Novo Produto</h3>
+                    
+                    <form method="POST" action="/salvar_produto" enctype="multipart/form-data">
+                        
+                        <div style="display: flex; gap: 30px; align-items: start;">
+                            <div style="text-align: center;">
+                                <label style="font-weight: 600; display: block; margin-bottom: 10px;">Foto do Produto</label>
+                                <label for="foto" style="cursor: pointer;">
+                                    <img id="preview-img" src="/static/img/sem-imagem.png" style="width: 150px; height: 150px; object-fit: cover; border-radius: 12px; border: 2px dashed #ddd; padding: 5px;">
+                                </label>
+                                <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImagem(event)" style="display: none;">
+                                <p style="font-size: 12px; color: #888; margin-top: 5px;">Clique na imagem para trocar</p>
+                            </div>
 
-<button class="tablink" onclick="openTab('cadastro')">Cadastro</button>
-<button class="tablink" onclick="openTab('consulta')">Consulta</button>
+                            <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="grid-column: span 2;">
+                                    <label style="font-weight: 600;">Nome do Produto</label>
+                                    <input type="text" name="nome" required style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-weight: 600;">Código</label>
+                                    <input type="text" name="codigo" required style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-weight: 600;">Marca</label>
+                                    <input type="text" name="marca" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                                </div>
 
+                                <div>
+                                    <label style="font-weight: 600;">Preço Compra (R$)</label>
+                                    <input type="text" name="preco_compra" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                                </div>
+
+                                <div>
+                                    <label style="font-weight: 600;">Preço Venda (R$)</label>
+                                    <input type="text" name="preco_venda" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px; font-weight: bold; color: #2e7d32;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
+                            <div>
+                                <label style="font-weight: 600;">Fornecedor</label>
+                                <select name="fornecedor" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                                    {% for fornecedor in fornecedores %}
+                                    <option value="{{ fornecedor.id }}">{{ fornecedor.razao_social }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-weight: 600;">Estoque Inicial</label>
+                                <input type="number" name="estoque" value="0" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600;">Mínimo Segurança</label>
+                                <input type="number" name="estoque_minimo" value="5" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <label style="font-weight: 600;">Observações</label>
+                            <textarea name="observacoes" style="width: 100%; height: 80px; padding: 10px; border: 2px solid #eee; border-radius: 8px; resize: none;"></textarea>
+                        </div>
+
+                        <button type="submit" style="width: 100%; margin-top: 20px; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                            <i class="fa fa-save"></i> SALVAR PRODUTO NO SISTEMA
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="consulta" class="tabcontent" style="display:none;">
+    <div class="table-box" style="background: #ffffff; padding: 30px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #F57C00;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: #333;"><i class="fa fa-list"></i> Lista de Itens</h3>
+            
+            <form method="GET" action="/produtos" style="display: flex; gap: 10px;">
+                <input type="text" name="busca" placeholder="Buscar produto..." 
+                       style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; width: 250px;">
+                <button type="submit" style="background: #1976d2; color: white; border: none; border-radius: 20px; padding: 0 20px; cursor: pointer; font-weight: bold;">
+                    <i class="fa fa-search"></i> Pesquisar
+                </button>
+            </form>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left;">
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Foto</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Produto</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Estoque</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Código</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Preço</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee;">Fornecedor</th>
+                    <th style="padding: 15px; border-bottom: 2px solid #eee; text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr style="border-bottom: 1px solid #eee; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'" onmouseout="this.style.background='white'">
+                    <td style="padding: 10px; text-align: center;">
+                        <img src="{{ url_for('static', filename='img/' + (produto.foto or 'sem-imagem.png')) }}" 
+                             width="45" height="45" style="border-radius: 8px; object-fit: cover; border: 1px solid #eee;">
+                    </td>
+                    <td style="padding: 10px;">
+                        <div style="font-weight: 600; color: #333;">{{ produto.nome }}</div>
+                    </td>
+                    <td style="padding: 10px;">
+                        <span style="font-weight: bold;">{{ produto.estoque }}</span>
+                        <small style="color: gray;">(Mín: {{ produto.estoque_minimo }})</small>
+                        {% if produto.estoque <= produto.estoque_minimo %}
+                            <br><span style="background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: bold;">⚠️ REPOR</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px; color: #666; font-family: monospace;">{{ produto.codigo }}</td>
+                    <td style="padding: 10px; color: #2e7d32; font-weight: bold;">R$ {{ "%.2f"|format(produto.preco_venda) }}</td>
+                    <td style="padding: 10px; color: #555;">{{ produto.fornecedor.razao_social }}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <a href="/produto/{{ produto.id }}" title="Visualizar" 
+           style="background: #1976d2; color: white; padding: 6px 12px; display: flex; align-items: center; gap: 6px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s;">
+            <i class="fa fa-eye"></i> Visualizar
+        </a>
+
+        <a href="/editar_produto/{{ produto.id }}" title="Editar" 
+           style="background: #ffa000; color: white; padding: 6px 12px; display: flex; align-items: center; gap: 6px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s;">
+            <i class="fa fa-edit"></i> Editar
+        </a>
+
+        <a href="/excluir_produto/{{ produto.id }}" title="Excluir" 
+           onclick="return confirm('Deseja realmente excluir este produto?')"
+           style="background: #d32f2f; color: white; padding: 6px 12px; display: flex; align-items: center; gap: 6px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s;">
+            <i class="fa fa-trash"></i> Excluir
+        </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-
-
-<!-- ABA CADASTRO -->
-
-<div id="cadastro" class="tabcontent">
-
-<h3>Cadastro de Produto</h3>
-
-<form method="POST" action="/salvar_produto" enctype="multipart/form-data">
-
-
-<label>Foto do Produto</label>
-
-<div class="upload-imagem">
-
-<label for="foto" class="imagem-preview">
-
-<img id="preview-img" src="/static/img/sem-imagem.png">
-
-<span class="icone-camera">📷</span>
-
-</label>
-
-<input type="file" id="foto" name="foto" accept="image/*" onchange="previewImagem(event)">
-<br><br>
-
-</div>
-
-<label>Nome do Produto</label>
-<input type="text" name="nome">
-<br><br>
-
-<label>Situação</label>
-<br><br>
-
-<label class="switch">
-
-<input type="checkbox" name="ativo" checked>
-
-<span class="slider"></span>
-
-</label>
-
-<span>Produto ativo</span>
-<br><br>
-
-<label>Fornecedor</label>
-
-<select name="fornecedor" class="campo-grande">
-
-{% for fornecedor in fornecedores %}
-
-<option value="{{ fornecedor.id }}">
-
-{{ fornecedor.razao_social }}
-
-</option>
-
-{% endfor %}
-
-</select>
-
-<br><br>
-<label>Marca</label>
-<input type="text" name="marca">
-
-<br><br>
-<label>Código</label>
-<input type="text" name="codigo">
-
-<br><br>
-<label>Preço de Compra</label>
-<input type="text" name="preco_compra">
-
-<br><br>
-<label>Preço de Venda</label>
-<input type="text" name="preco_venda">
-
-<br><br>
-<label>Estoque Inicial</label>
-<input type="number" name="estoque" value="0">
-
-<br><br>
-<label>Observações</label>
-<br>
-<textarea name="observacoes" class="campo-observacao"></textarea>
-
-
-<br><br>
-
-<button type="submit">Salvar Produto</button>
-
-</form>
-
-</div>
-
-
-<div id="consulta" class="tabcontent" style="display:none">
-
-<h3>Consulta de Produtos</h3>
-
-<form method="GET" action="/produtos">
-
-<input type="text" name="busca" placeholder="Buscar produto">
-
-<button type="submit">Pesquisar</button>
-
-</form>
-
-<br>
-
-<table class="tabela-clientes">
-
-<tr>
-<th>Foto</th>
-<th>Produto</th>
-<th>Estoque</th>
-<th>Código</th>
-<th>Preço</th>
-<th>Fornecedor</th>
-<th>Visualizar</th>
-<th>Editar</th>
-<th>Excluir</th>
-
-</tr>
-
-{% for produto in produtos %}
-
-<tr class="{{ 'estoque-baixo' if produto.estoque <= produto.estoque_minimo else '' }}">
-
-<td>
-    <img src="{{ url_for('static', filename='img/' + (produto.foto or 'sem-imagem.png')) }}" width="50" style="border-radius: 5px;">    
-</td>
-
-<td>
-        {{ produto.nome }}
-        {% if produto.estoque <= produto.estoque_minimo %}
-            <span class="badge-alerta">⚠️ REPOR</span>
-        {% endif %}
-</td>
-
-<td>
-    {{ produto.estoque }} 
-    <small style="color: gray;">(Mín: {{ produto.estoque_minimo }})</small>
-</td>
-
-<td>{{ produto.codigo }}</td>
-
-<td>R$ {{ "%.2f"|format(produto.preco_venda) }}</td>
-
-<td>{{ produto.fornecedor.razao_social }}</td>
-
-<td>
-
-<a href="/produto/{{ produto.id }}" class="btn-detalhe">
-
-👁
-
-</a>
-
-</td>
-
-<td>
-
-<a href="/editar_produto/{{ produto.id }}" class="btn-editar">
-
-✏
-
-</a>
-
-</td>
-
-<td>
-
-<a href="/excluir_produto/{{ produto.id }}" class="btn-excluir">
-
-🗑
-
-</a>
-
-</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+            tablinks[i].style.background = "#e0e0e0";
+            tablinks[i].style.color = "#555";
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+        evt.currentTarget.style.background = "#1976d2";
+        evt.currentTarget.style.color = "white";
+    }
+
+    function previewImagem(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('preview-img');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    document.getElementById("defaultOpen").click();
+    </script>
 </body>
-
 </html>

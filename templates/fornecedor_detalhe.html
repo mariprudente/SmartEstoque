@@ -1,66 +1,77 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-br">
 <head>
-
-<meta charset="UTF-8">
-
-<title>Detalhes do Fornecedor</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Detalhes do Fornecedor - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-
 <body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">📄 Ficha do Fornecedor</h2>
 
-<div class="container">
+            <div class="card-detalhe" style="max-width: 850px; margin: 0 auto; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 5px solid #7B5FB3;">
+                
+                <div style="background: #f8f9fa; padding: 30px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 20px;">
+                    <div style="width: 80px; height: 80px; background: #1976d2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px;">
+                        <i class="fa fa-truck"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: #333; font-size: 24px;">{{ fornecedor.razao_social }}</h3>
+                        <span style="color: #666; font-size: 14px;">CNPJ: {{ fornecedor.cnpj }}</span>
+                    </div>
+                </div>
 
-{% include 'menu.html' %}
+                <div style="padding: 30px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        
+                        <div>
+                            <h4 style="border-bottom: 2px solid #1976d2; padding-bottom: 8px; color: #1976d2; margin-bottom: 15px;"><i class="fa fa-building"></i> Dados Empresariais</h4>
+                            <p style="margin-bottom: 10px;"><strong>Razão Social:</strong> <span style="color: #555;">{{ fornecedor.razao_social }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>CNPJ:</strong> <span style="color: #555;">{{ fornecedor.cnpj }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>Inscrição Estadual:</strong> <span style="color: #555;">{{ fornecedor.inscricao_estadual or 'Isento/Não inf.' }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>Contato/Vendedor:</strong> <span style="color: #555;">{{ fornecedor.contato or 'Não informado' }}</span></p>
+                        </div>
 
-<div class="content">
+                        <div>
+                            <h4 style="border-bottom: 2px solid #2e7d32; padding-bottom: 8px; color: #2e7d32; margin-bottom: 15px;"><i class="fa fa-phone"></i> Contato</h4>
+                            <p style="margin-bottom: 10px;"><strong>Telefone Fixo:</strong> <span style="color: #555;">{{ fornecedor.telefone or 'Não informado' }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>Celular/Whats:</strong> <span style="color: #555;">{{ fornecedor.celular or 'Não informado' }}</span></p>
+                            <p style="margin-bottom: 10px;"><strong>E-mail:</strong> <span style="color: #1976d2; text-decoration: underline;">{{ fornecedor.email }}</span></p>
+                        </div>
+                    </div>
 
-<h2>Detalhes do Fornecedor</h2>
+                    <div style="margin-top: 30px; background: #f9f9f9; padding: 20px; border-radius: 10px; border-left: 5px solid #ffa000;">
+                        <h4 style="color: #333; margin-bottom: 10px;"><i class="fa fa-map-marker"></i> Localização</h4>
+                        <p style="margin: 0; color: #555; line-height: 1.6;">
+                            <strong>Logradouro:</strong> {{ fornecedor.endereco }}, Nº {{ fornecedor.numero }} 
+                            {% if fornecedor.complemento %}- {{ fornecedor.complemento }}{% endif %}<br>
+                            <strong>Bairro:</strong> {{ fornecedor.bairro or 'N/A' }} | <strong>CEP:</strong> {{ fornecedor.cep }}<br>
+                            {{ fornecedor.cidade }} - {{ fornecedor.uf }}
+                        </p>
+                    </div>
 
-<div class="form-box">
+                    {% if fornecedor.observacoes %}
+                    <div style="margin-top: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 8px;">
+                        <h4 style="color: #666; font-size: 14px; margin-bottom: 5px;"><i class="fa fa-commenting-o"></i> Observações Internas:</h4>
+                        <p style="margin: 0; color: #777; font-style: italic;">"{{ fornecedor.observacoes }}"</p>
+                    </div>
+                    {% endif %}
 
-<p><b>Razão Social:</b> {{ fornecedor.razao_social }}</p>
-
-<p><b>CNPJ:</b> {{ fornecedor.cnpj }}</p>
-
-<p><b>Contato:</b> {{ fornecedor.contato }}</p>
-
-<p><b>CEP:</b> {{ fornecedor.cep }}</p>
-
-<p><b>Endereço:</b> {{ fornecedor.endereco }}</p>
-
-<p><b>Número:</b> {{ fornecedor.numero }}</p>
-
-<p><b>Complemento:</b> {{ fornecedor.complemento }}</p>
-
-<p><b>Bairro:</b> {{ fornecedor.bairro }}</p>
-
-<p><b>Cidade:</b> {{ fornecedor.cidade }}</p>
-
-<p><b>UF:</b> {{ fornecedor.uf }}</p>
-
-<p><b>Telefone:</b> {{ fornecedor.telefone }}</p>
-
-<p><b>Celular:</b> {{ fornecedor.celular }}</p>
-
-<p><b>Email:</b> {{ fornecedor.email }}</p>
-
-<p><b>Observações:</b> {{ fornecedor.observacoes }}</p>
-
-<br>
-
-<a href="/fornecedores">⬅ Voltar</a>
-
-</div>
-
-</div>
-
-</div>
-
+                    <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: flex-end;">
+                        <a href="/fornecedores" style="padding: 12px 25px; background: #6c757d; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                            <i class="fa fa-arrow-left"></i> VOLTAR
+                        </a>
+                        <a href="/editar_fornecedor/{{ fornecedor.id }}" style="padding: 12px 25px; background: #ffa000; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                            <i class="fa fa-edit"></i> EDITAR FORNECEDOR
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
-
 </html>

@@ -1,137 +1,126 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-br">
 <head>
-
-<meta charset="UTF-8">
-<title>Controle de Estoque</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Controle de Estoque - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-
 <body>
+    <div class="container">
+        {% include 'menu.html' %}
 
-<div class="container">
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">📦 Controle de Estoque</h2>
 
-{% include 'menu.html' %}
+            <div class="tabs" style="display: flex; margin-bottom: 0px;">
+                <button id="defaultOpen" class="tablink" onclick="openTab(event, 'movimentacao')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; transition: 0.3s;">
+                    <i class="fa fa-exchange"></i> Movimentação
+                </button>
+                <button class="tablink" onclick="openTab(event, 'historico')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; margin-left: 5px; transition: 0.3s;">
+                    <i class="fa fa-history"></i> Histórico
+                </button>
+            </div>
 
-<div class="content">
+            <div id="movimentacao" class="tabcontent">
+                <div class="form-box" style="background: #ffffff; padding: 40px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #1976d2; max-width: 700px;">
+                    <h3 style="margin-bottom: 25px; color: #333;"><i class="fa fa-plus-circle"></i> Registrar Entrada ou Saída</h3>
+                    
+                    <form method="POST" action="/movimentar_estoque">
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Produto</label>
+                            <select name="produto" required style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px;">
+                                <option value="" disabled selected>Selecione um produto...</option>
+                                {% for produto in produtos %}
+                                <option value="{{ produto.id }}">
+                                    {{ produto.nome }} (Atual: {{ produto.estoque }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-<h2>Controle de Estoque</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Tipo de Operação</label>
+                                <select name="tipo" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-weight: bold;">
+                                    <option value="entrada" style="color: #2e7d32;">⬇ ENTRADA (+)</option>
+                                    <option value="saida" style="color: #d32f2f;">⬆ SAÍDA (-)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Quantidade</label>
+                                <input type="number" name="quantidade" min="1" required style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                        </div>
 
-<div class="tabs">
+                        <div style="margin-bottom: 30px;">
+                            <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">Motivo / Observação</label>
+                            <textarea name="observacao" placeholder="Ex: Compra com fornecedor X, Ajuste de inventário..." style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; height: 80px; resize: none;"></textarea>
+                        </div>
 
-<button onclick="openTab('movimentacao')">Movimentação</button>
+                        <button type="submit" style="width: 100%; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s;">
+                            <i class="fa fa-check-circle"></i> CONFIRMAR MOVIMENTAÇÃO
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-<button onclick="openTab('historico')">Histórico</button>
+            <div id="historico" class="tabcontent" style="display:none;">
+                <div class="table-box" style="background: #ffffff; padding: 30px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #1976d2;">
+                    <h3 style="margin-bottom: 20px; color: #333;"><i class="fa fa-list-alt"></i> Últimas Movimentações</h3>
+                    
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; text-align: left;">
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">Data/Hora</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">Produto</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee; text-align: center;">Tipo</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee; text-align: center;">Qtd</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mov in movimentacoes %}
+                            <tr style="border-bottom: 1px solid #eee; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'" onmouseout="this.style.background='white'">
+                                <td style="padding: 12px; color: #666; font-size: 14px;">{{ mov.data }}</td>
+                                <td style="padding: 12px; font-weight: 600; color: #333;">{{ mov.produto.nome }}</td>
+                                <td style="padding: 12px; text-align: center;">
+                                    {% if mov.tipo == 'entrada' %}
+                                        <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">ENTRADA</span>
+                                    {% else %}
+                                        <span style="background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">SAÍDA</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 12px; text-align: center; font-weight: bold;">{{ mov.quantidade }}</td>
+                                <td style="padding: 12px; color: #888; font-style: italic; font-size: 13px;">{{ mov.observacao or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-</div>
+    <script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].style.background = "#e0e0e0";
+            tablinks[i].style.color = "#555";
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.style.background = tabName === 'movimentacao' ? "#1976d2" : "#6c757d";
+        evt.currentTarget.style.color = "white";
+    }
 
-
-<!-- ABA MOVIMENTAÇÃO -->
-
-<div id="movimentacao" class="tabcontent">
-
-<h3>Movimentar Produto</h3>
-
-<form method="POST" action="/movimentar_estoque">
-
-<label>Produto</label>
-
-<select name="produto">
-
-{% for produto in produtos %}
-
-<option value="{{ produto.id }}">
-{{ produto.nome }}
-</option>
-
-{% endfor %}
-
-</select>
-
-
-<label>Tipo</label>
-
-<select name="tipo">
-
-<option value="entrada">Entrada</option>
-<option value="saida">Saída</option>
-
-</select>
-
-
-<label>Quantidade</label>
-
-<input type="number" name="quantidade">
-
-
-<label>Observação</label>
-
-<textarea name="observacao"></textarea>
-
-
-<br><br>
-
-<button type="submit">
-
-Registrar movimentação
-
-</button>
-
-</form>
-
-</div>
-
-
-
-<!-- ABA HISTÓRICO -->
-
-<div id="historico" class="tabcontent" style="display:none">
-
-<h3>Histórico de Movimentações</h3>
-
-<table class="tabela-clientes">
-
-<tr>
-
-<th>Data</th>
-<th>Produto</th>
-<th>Tipo</th>
-<th>Quantidade</th>
-<th>Observação</th>
-
-</tr>
-
-{% for mov in movimentacoes %}
-
-<tr>
-
-<td>{{ mov.data }}</td>
-
-<td>{{ mov.produto.nome }}</td>
-
-<td>{{ mov.tipo }}</td>
-
-<td>{{ mov.quantidade }}</td>
-
-<td>{{ mov.observacao }}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    // Define a aba inicial
+    document.getElementById("defaultOpen").click();
+    </script>
 </body>
-
 </html>

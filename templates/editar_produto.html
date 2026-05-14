@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Produto</title>
+    <title>Editar Produto - Smart Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -10,45 +10,99 @@
         {% include 'menu.html' %}
         
         <div class="content">
-            <h2>Editar Produto: {{ produto.nome }}</h2>
+            <h2 style="margin-bottom: 25px;">📝 Editar Produto</h2>
 
-            <form action="/atualizar_produto/{{ produto.id }}" method="POST">
-                
-                <label>Nome do Produto</label>
-                <input type="text" name="nome" value="{{ produto.nome }}" required>
+            <div class="form-box" style="max-width: 750px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #F57C00;">
+    
+    <h3 style="text-align: center; color: #333; margin-bottom: 25px;">Alterar Informações: {{ produto.nome }}</h3>
 
-                <label>Marca</label>
-                <input type="text" name="marca" value="{{ produto.marca }}">
+    <form action="/atualizar_produto/{{ produto.id }}" method="POST" enctype="multipart/form-data">
+        
+        <div style="display: flex; gap: 30px; margin-bottom: 20px; align-items: start;">
+            
+            <div style="text-align: center;">
+                <label style="font-weight: 600; color: #555; display: block; margin-bottom: 10px;">Foto do Produto</label>
+                <label for="foto" style="cursor: pointer; display: block;">
+                    <img id="preview-img" src="{{ url_for('static', filename='img/' + (produto.foto or 'sem-imagem.png')) }}" 
+                         style="width: 180px; height: 180px; object-fit: cover; border-radius: 12px; border: 3px dashed #ddd; padding: 5px; transition: 0.3s;"
+                         onmouseover="this.style.borderColor='#1976d2'" onmouseout="this.style.borderColor='#ddd'">
+                </label>
+                <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImagem(event)" style="display: none;">
+                <p style="font-size: 12px; color: #1976d2; margin-top: 8px; font-weight: bold;"><i class="fa fa-sync"></i> Clique para trocar a foto</p>
+            </div>
 
-                <label>Código</label>
-                <input type="text" name="codigo" value="{{ produto.codigo }}">
+            <div style="flex: 1;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div style="grid-column: span 2;">
+                        <label style="font-weight: 600; color: #555;">Nome do Produto</label>
+                        <input type="text" name="nome" value="{{ produto.nome }}" required style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #555;">Código</label>
+                        <input type="text" name="codigo" value="{{ produto.codigo }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #555;">Marca</label>
+                        <input type="text" name="marca" value="{{ produto.marca }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                    </div>
+                </div>
 
-                <label>Preço de Compra</label>
-                <input type="text" name="preco_compra" value="{{ produto.preco_compra }}">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="font-weight: 600; color: #555;">Preço Venda</label>
+                        <input type="text" name="preco_venda" value="{{ produto.preco_venda }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px; font-weight: bold; color: #2e7d32;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; color: #555;">Estoque Atual</label>
+                        <input type="number" name="estoque" value="{{ produto.estoque }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <label>Preço de Venda</label>
-                <input type="text" name="preco_venda" value="{{ produto.preco_venda }}">
-
-                <label>Estoque Atual</label>
-                <input type="number" name="estoque" value="{{ produto.estoque }}">
-
-                <label>Fornecedor</label>
-                <select name="fornecedor">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+                <label style="font-weight: 600; color: #555;">Fornecedor</label>
+                <select name="fornecedor" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
                     {% for f in fornecedores %}
-                        <option value="{{ f.id }}" {% if f.id == produto.fornecedor_id %}selected{% endif %}>
-                            {{ f.razao_social }}
-                        </option>
+                        <option value="{{ f.id }}" {% if f.id == produto.fornecedor_id %}selected{% endif %}>{{ f.razao_social }}</option>
                     {% endfor %}
                 </select>
+            </div>
+            <div>
+                <label style="font-weight: 600; color: #555;">Preço Compra</label>
+                <input type="text" name="preco_compra" value="{{ produto.preco_compra }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+            </div>
+            <div>
+                <label style="font-weight: 600; color: #555;">Mínimo Segurança</label>
+                <input type="number" name="estoque_minimo" value="{{ produto.estoque_minimo }}" style="width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px;">
+            </div>
+        </div>
 
-                <label>Observações</label>
-                <textarea name="observacoes">{{ produto.observacoes }}</textarea>
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: 600; color: #555;">Observações</label>
+            <textarea name="observacoes" style="width: 100%; height: 70px; padding: 10px; border: 2px solid #eee; border-radius: 8px; resize: none;">{{ produto.observacoes }}</textarea>
+        </div>
 
-                <div class="botoes">
-                    <button type="submit" class="btn-salvar">Salvar Alterações</button>
-                    <a href="/produtos" class="btn-cancelar">Cancelar</a>
-                </div>
-            </form>
+        <div style="display: flex; gap: 15px;">
+            <button type="submit" style="flex: 2; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                <i class="fa fa-save"></i> SALVAR ALTERAÇÕES
+            </button>
+            <a href="/produtos" style="flex: 1; padding: 15px; background: #6c757d; color: white; border-radius: 10px; text-decoration: none; text-align: center; font-weight: bold; line-height: 1.5;">CANCELAR</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function previewImagem(event) {
+    var reader = new FileReader();
+    reader.onload = function(){
+        var output = document.getElementById('preview-img');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
         </div>
     </div>
 </body>

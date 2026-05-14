@@ -10,31 +10,35 @@
         {% include 'menu.html' %}
         
         <div class="content">
-            <h2>Detalhes do Produto</h2>
-            <div class="card-detalhe">
-                <div class="info-principal">
-                    
-                    <p><strong>Nome:</strong> {{ produto.nome }}</p>
-                    <p><strong>Código:</strong> {{ produto.codigo }}</p>
-                    <p><strong>Marca:</strong> {{ produto.marca }}</p>
-                </div>
-                
-                <hr>
-                
-                <div class="info-valores">
-                    <p><strong>Preço de Venda:</strong> R$ {{ "%.2f"|format(produto.preco_venda) }}</p>
-                    <p><strong>Estoque Atual:</strong> {{ produto.estoque }} unidades</p>
-                    <p><strong>Fornecedor:</strong> {{ produto.fornecedor.razao_social }}</p>
-                </div>
-
-                <div class="info-obs">
-                    <p><strong>Observações:</strong> {{ produto.observacoes or 'Nenhuma observação.' }}</p>
-                </div>
-
-                <br>
-                <a href="/produtos" class="btn-voltar">⬅ Voltar para Lista</a>
-            </div>
+    <div class="form-box" style="max-width: 600px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #F57C00;">
+        <h2 style="text-align: center; color: #333; margin-bottom: 25px;">Ficha do Produto</h2>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+            <img src="{{ url_for('static', filename='img/' + (produto.foto or 'sem-imagem.png')) }}" 
+                 style="width: 200px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid #f8f9fa; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
         </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px;">
+            <p><strong><i class="fa fa-tag"></i> Nome:</strong><br> {{ produto.nome }}</p>
+            <p><strong><i class="fa fa-barcode"></i> Código:</strong><br> {{ produto.codigo }}</p>
+            <p><strong><i class="fa fa-industry"></i> Marca:</strong><br> {{ produto.marca }}</p>
+            <p><strong><i class="fa fa-truck"></i> Fornecedor:</strong><br> {{ produto.fornecedor.razao_social }}</p>
+            <p><strong><i class="fa fa-money-bill-wave" style="color: #2e7d32;"></i> Preço:</strong><br> R$ {{ "%.2f"|format(produto.preco_venda) }}</p>
+            <p><strong><i class="fa fa-layer-group"></i> Estoque:</strong><br> {{ produto.estoque }} unidades</p>
+        </div>
+
+        <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <p><strong><i class="fa fa-comment-alt"></i> Observações:</strong><br> 
+           <span style="color: #666;">{{ produto.observacoes or 'Nenhuma observação cadastrada.' }}</span>
+        </p>
+
+        <br>
+        <a href="/produtos" class="btn-voltar" style="display: block; text-align: center; padding: 12px; background: #1976d2; color: white; border-radius: 10px; text-decoration: none; font-weight: bold;">
+            ⬅ Voltar para Lista
+        </a>
+    </div>
+</div>
     </div>
 </body>
 </html>

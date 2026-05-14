@@ -79,6 +79,13 @@ class Movimentacao(db.Model):
     data = db.Column(db.String(20))
     observacao = db.Column(db.Text)
 
+class Caixa(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.DateTime, default=datetime.utcnow)
+    descricao = db.Column(db.String(200), nullable=False)
+    tipo = db.Column(db.String(10), nullable=False) 
+    valor = db.Column(db.Float, nullable=False)   
+
 # =====================================
 # ROTAS
 # =====================================
@@ -129,6 +136,33 @@ def excluir_cliente(id):
     db.session.commit()
     return redirect('/clientes')
 
+@app.route('/atualizar_cliente/<int:id>', methods=['POST'])
+def atualizar_cliente(id):
+    cliente = Cliente.query.get_or_404(id)
+    cliente.nome = request.form.get('nome')
+    cliente.cpf = request.form.get('cpf')
+    cliente.rg = request.form.get('rg')
+    cliente.nascimento = request.form.get('nascimento')
+    cliente.rua = request.form.get('rua')
+    cliente.numero = request.form.get('numero')
+    cliente.cidade = request.form.get('cidade')
+    cliente.estado = request.form.get('estado')
+    cliente.telefone = request.form.get('telefone')
+    cliente.celular = request.form.get('celular')
+    cliente.email = request.form.get('email')
+
+    try:
+        db.session.commit() 
+        return redirect('/clientes') 
+    except:
+        db.session.rollback()
+        return "Houve um erro ao atualizar o cliente."
+
+@app.route('/editar_cliente/<int:id>')
+def editar_cliente(id):
+    cliente = Cliente.query.get_or_404(id)
+    return render_template('editar_cliente.html', cliente=cliente)    
+
 @app.route('/fornecedores')
 def fornecedores():
     busca = request.args.get("busca")
@@ -145,24 +179,32 @@ def fornecedores():
 
 @app.route('/salvar_fornecedor', methods=['POST'])
 def salvar_fornecedor():
+    # Usando .get() para evitar o erro BadRequestKeyError
     fornecedor = Fornecedor(
-        razao_social=request.form['razao_social'],
-        cnpj=request.form['cnpj'],
-        contato=request.form['contato'],
-        cep=request.form['cep'],
-        endereco=request.form['endereco'],
-        numero=request.form['numero'],
-        complemento=request.form['complemento'],
-        bairro=request.form['bairro'],
-        cidade=request.form['cidade'],
-        uf=request.form['uf'],
-        telefone=request.form['telefone'],
-        celular=request.form['celular'],
-        email=request.form['email'],
-        observacoes=request.form['observacoes']
+        razao_social=request.form.get('razao_social'),
+        cnpj=request.form.get('cnpj'),
+        contato=request.form.get('contato'),
+        cep=request.form.get('cep'),
+        endereco=request.form.get('endereco'),
+        numero=request.form.get('numero'),
+        complemento=request.form.get('complemento'), # Agora não vai mais travar aqui!
+        bairro=request.form.get('bairro'),
+        cidade=request.form.get('cidade'),
+        uf=request.form.get('uf'),
+        telefone=request.form.get('telefone'),
+        celular=request.form.get('celular'),
+        email=request.form.get('email'),
+        observacoes=request.form.get('observacoes'),
+        ativo=True # Garante que ele comece como ativo
     )
-    db.session.add(fornecedor)
-    db.session.commit()
+    
+    try:
+        db.session.add(fornecedor)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Erro ao salvar no banco de dados."
+        
     return redirect('/fornecedores')
 
 @app.route('/excluir_fornecedor/<int:id>')
@@ -177,6 +219,33 @@ def excluir_fornecedor(id):
 def fornecedor_detalhe(id):
     fornecedor = Fornecedor.query.get(id)
     return render_template("fornecedor_detalhe.html", fornecedor=fornecedor)
+
+@app.route('/editar_fornecedor/<int:id>')
+def editar_fornecedor(id):
+    fornecedor = Fornecedor.query.get_or_404(id)
+    return render_template('editar_fornecedor.html', fornecedor=fornecedor)
+
+@app.route('/atualizar_fornecedor/<int:id>', methods=['POST'])
+def atualizar_fornecedor(id):
+    fornecedor = Fornecedor.query.get_or_404(id)
+    
+    fornecedor.razao_social = request.form.get('razao_social')
+    fornecedor.cnpj = request.form.get('cnpj')
+    fornecedor.inscricao_estadual = request.form.get('inscricao_estadual')
+    fornecedor.rua = request.form.get('rua')
+    fornecedor.numero = request.form.get('numero')
+    fornecedor.cidade = request.form.get('cidade')
+    fornecedor.estado = request.form.get('estado')
+    fornecedor.telefone = request.form.get('telefone')
+    fornecedor.celular = request.form.get('celular')
+    fornecedor.email = request.form.get('email')
+
+    try:
+        db.session.commit()
+        return redirect('/fornecedores')
+    except:
+        db.session.rollback()
+        return "Erro ao atualizar fornecedor."
 
 @app.route('/produtos')
 def produtos():
@@ -259,29 +328,51 @@ def estoque():
 
 @app.route('/movimentar_estoque', methods=['POST'])
 def movimentar_estoque():
-    produto_id = request.form['produto']
-    tipo = request.form['tipo']
-    quantidade = int(request.form['quantidade'])
-    observacao = request.form['observacao']
+    id_p = request.form.get('produto')
+    tipo = request.form.get('tipo')
+    qtd = int(request.form.get('quantidade'))
+    obs = request.form.get('observacao')
+    
+    produto = db.session.get(Produto, id_p)
+    
+    if tipo == 'entrada':
+        produto.estoque += qtd
+        # Ajustado de preco_custo para preco_compra conforme seu model
+        valor_total = produto.preco_compra * qtd 
+        
+        novo_gasto = Caixa(
+            descricao=f"Compra de estoque: {produto.nome} (x{qtd})",
+            tipo='saida',
+            valor=valor_total,
+            data=datetime.now()
+        )
+        db.session.add(novo_gasto)
+        msg_obs = f"Compra: {obs}" if obs else "Entrada de mercadoria"
+        
+    else: # Saída
+        if produto.estoque < qtd:
+            return "Erro: Quantidade de saída maior que o estoque atual.", 400
+        produto.estoque -= qtd
+        msg_obs = f"Ajuste/Perda: {obs}" if obs else "Saída manual"
 
-    produto = Produto.query.get(produto_id)
-
-    if tipo == "entrada":
-        produto.estoque += quantidade
-    else:
-        produto.estoque -= quantidade
-
-    mov = Movimentacao(
-        produto_id=produto_id,
+    # Registra no histórico de movimentações (usando produto_id conforme seu model)
+    nova_mov = Movimentacao(
+        produto_id=id_p,
         tipo=tipo,
-        quantidade=quantidade,
-        data=datetime.now().strftime("%d/%m/%Y"),
-        observacao=observacao
+        quantidade=qtd,
+        observacao=msg_obs,
+        data=datetime.now().strftime('%d/%m/%Y %H:%M')
     )
-
-    db.session.add(mov)
-    db.session.commit()
-    return redirect('/estoque')
+    
+    db.session.add(nova_mov)
+    
+    try:
+        db.session.commit()
+        return redirect(url_for('estoque'))
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao movimentar: {e}")
+        return "Erro interno ao processar movimentação.", 500
 
 @app.route('/atualizar_produto/<int:id>', methods=['POST'])
 def atualizar_produto(id):
@@ -300,6 +391,68 @@ def atualizar_produto(id):
     db.session.commit()
     return redirect('/produtos')
 
+@app.route('/caixa')
+def caixa():
+    lancamentos = Caixa.query.order_by(Caixa.data.desc()).all()
+    
+    total_entradas = db.session.query(db.func.sum(Caixa.valor)).filter(Caixa.tipo == 'entrada').scalar() or 0
+    total_saidas = db.session.query(db.func.sum(Caixa.valor)).filter(Caixa.tipo == 'saida').scalar() or 0
+    
+    return render_template('caixa.html', 
+                           lancamentos=lancamentos, 
+                           total_entradas=total_entradas, 
+                           total_saidas=total_saidas)
+
+@app.route('/vendas')
+def vendas():
+    produtos = Produto.query.filter(Produto.estoque > 0).all() 
+    clientes = Cliente.query.all()
+    return render_template('vendas.html', produtos=produtos, clientes=clientes)
+
+@app.route('/finalizar_venda', methods=['POST'])
+def finalizar_venda():
+    p_id = request.form.get('produto_id')
+    qtd_solicitada = int(request.form.get('quantidade'))
+    
+    produto = db.session.get(Produto, p_id)
+    
+    if produto.estoque < qtd_solicitada:
+        return f"Estoque insuficiente! O produto {produto.nome} possui apenas {produto.estoque} unidades."
+
+    # 1. Baixa o estoque do produto
+    produto.estoque -= qtd_solicitada
+    
+    # 2. Registra o financeiro no Caixa
+    valor_venda = produto.preco_venda * qtd_solicitada
+    novo_lancamento = Caixa(
+        descricao=f"Venda: {produto.nome} (x{qtd_solicitada})",
+        tipo='entrada',
+        valor=valor_venda,
+        data=datetime.now()
+    )
+    db.session.add(novo_lancamento)
+
+    # 3. REGISTRA NO HISTÓRICO DE ESTOQUE (Nome de campo corrigido)
+    nova_movimentacao = Movimentacao(
+        produto_id=p_id, # Usando o nome correto que está na sua classe Movimentacao
+        tipo='saida',
+        quantidade=qtd_solicitada,
+        observacao=f"Venda efetuada via sistema",
+        # Convertendo para String pois seu modelo usa db.String(20)
+        data=datetime.now().strftime('%d/%m/%Y %H:%M') 
+    )
+    db.session.add(nova_movimentacao)
+
+    try:
+        db.session.commit()
+        return redirect(url_for('caixa'))
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao salvar: {e}")
+        return "Erro ao processar a venda no banco de dados.", 500
+
+
+
 # =====================================
 # INICIAR SISTEMA
 # =====================================
@@ -308,3 +461,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
+    if __name__ == "__main__":
+        app.run(host='0.0.0.0', port=5000, debug=True)

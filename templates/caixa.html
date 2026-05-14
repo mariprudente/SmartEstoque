@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Fluxo de Caixa - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="container">
+        {% include 'menu.html' %}
+        
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">💰 Fluxo de Caixa</h2>
+            
+            <div class="cards-financeiro" style="display: flex; gap: 20px; margin-bottom: 30px;">
+                <div class="card-f" style="background: #ffffff; padding: 25px; border-radius: 15px; flex: 1; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #2e7d32;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: #666; font-size: 13px; text-transform: uppercase;">Entradas (Vendas)</h3>
+                        <i class="fa fa-arrow-down" style="color: #2e7d32;"></i>
+                    </div>
+                    <p style="color: #2e7d32; font-size: 26px; font-weight: 800; margin: 10px 0 0 0;">R$ {{ "%.2f"|format(total_entradas) }}</p>
+                </div>
+
+                <div class="card-f" style="background: #ffffff; padding: 25px; border-radius: 15px; flex: 1; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #d32f2f;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: #666; font-size: 13px; text-transform: uppercase;">Saídas (Compras)</h3>
+                        <i class="fa fa-arrow-up" style="color: #d32f2f;"></i>
+                    </div>
+                    <p style="color: #d32f2f; font-size: 26px; font-weight: 800; margin: 10px 0 0 0;">R$ {{ "%.2f"|format(total_saidas) }}</p>
+                </div>
+
+                {% set saldo = total_entradas - total_saidas %}
+                <div class="card-f" style="background: #1976d2; padding: 25px; border-radius: 15px; flex: 1; box-shadow: 0 8px 20px rgba(25, 118, 210, 0.2); color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.9;">Saldo em Caixa</h3>
+                        <i class="fa fa-university"></i>
+                    </div>
+                    <p style="font-size: 26px; font-weight: 800; margin: 10px 0 0 0;">R$ {{ "%.2f"|format(saldo) }}</p>
+                </div>
+            </div>
+
+            <div class="table-box" style="background: #ffffff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: #333; margin: 0;"><i class="fa fa-history"></i> Extrato Detalhado</h3>
+                    <button onclick="window.print()" style="background: #f8f9fa; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555;">
+                        <i class="fa fa-print"></i> RELATÓRIO PDF
+                    </button>
+                </div>
+                
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa; text-align: left;">
+                            <th style="padding: 15px; border-bottom: 2px solid #eee; color: #777; font-size: 13px;">DATA</th>
+                            <th style="padding: 15px; border-bottom: 2px solid #eee; color: #777; font-size: 13px;">DESCRIÇÃO</th>
+                            <th style="padding: 15px; border-bottom: 2px solid #eee; color: #777; font-size: 13px; text-align: center;">TIPO</th>
+                            <th style="padding: 15px; border-bottom: 2px solid #eee; color: #777; font-size: 13px; text-align: right;">VALOR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lancamento in lancamentos %}
+                        <tr style="border-bottom: 1px solid #f9f9f9; transition: 0.3s;" onmouseover="this.style.background='#fcfcfc'" onmouseout="this.style.background='white'">
+                            <td style="padding: 12px 15px; color: #999; font-size: 13px;">
+                                {{ lancamento.data.strftime('%d/%m/%Y %H:%M') }}
+                            </td>
+                            <td style="padding: 12px 15px; font-weight: 500; color: #444;">
+                                {{ lancamento.descricao }}
+                            </td>
+                            <td style="padding: 12px 15px; text-align: center;">
+                                {% if lancamento.tipo == 'entrada' %}
+                                    <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #c8e6c9;">
+                                        <i class="fa fa-plus"></i> ENTRADA
+                                    </span>
+                                {% else %}
+                                    <span style="background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #ffcdd2;">
+                                        <i class="fa fa-minus"></i> SAÍDA
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: 700; font-family: monospace; font-size: 15px; color: {% if lancamento.tipo == 'entrada' %}#2e7d32{% else %}#d32f2f{% endif %};">
+                                R$ {{ "%.2f"|format(lancamento.valor) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

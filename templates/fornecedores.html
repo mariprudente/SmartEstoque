@@ -1,219 +1,189 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-br">
 <head>
-
-<meta charset="UTF-8">
-
-<title>Fornecedores</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Fornecedores - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 </head>
-
 <body>
+    <div class="container">
+        {% include 'menu.html' %}
 
-<div class="container">
+        <div class="content">
+            <h2 style="margin-bottom: 25px;">🏢 Gerenciamento de Fornecedores</h2>
 
-{% include 'menu.html' %}
+            <div class="tabs" style="margin-bottom: 0px; display: flex;">
+                <button id="defaultOpen" class="tablink" onclick="openTab(event, 'cadastro')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; transition: 0.3s;">Cadastro</button>
+                <button class="tablink" onclick="openTab(event, 'consulta')" style="padding: 12px 25px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-weight: bold; margin-left: 5px; transition: 0.3s;">Consulta</button>
+            </div>
 
-<div class="content">
+            <div id="cadastro" class="tabcontent">
+                <div class="form-box" style="background: #ffffff; padding: 40px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #7B5FB3;">
+                    <h3 style="margin-bottom: 25px; color: #333;"><i class="fa fa-truck"></i> Novo Fornecedor</h3>
+                    
+                    <form method="POST" action="/salvar_fornecedor">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Razão Social</label>
+                                <input type="text" name="razao_social" required style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">CNPJ</label>
+                                <input type="text" id="cnpj" name="cnpj" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Contato (Vendedor)</label>
+                                <input type="text" name="contato" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                        </div>
 
-<h2>Fornecedores</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 3fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555;">CEP</label>
+                                <input type="text" id="cep" name="cep" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Logradouro (Rua/Av)</label>
+                                <input type="text" name="endereco" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Nº</label>
+                                <input type="text" name="numero" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                        </div>
 
-<div class="tabs">
+                        <div style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Bairro</label>
+                                <input type="text" name="bairro" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Cidade</label>
+                                <input type="text" name="cidade" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
 
-<button class="tablink" onclick="openTab('cadastro')">Cadastro</button>
-<button class="tablink" onclick="openTab('consulta')">Consulta</button>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Complemento</label>
+                                <input type="text" name="complemento" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
 
-</div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">UF</label>
+                                <select name="uf" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                                    <option value="SP">SP</option>
+                                    <option value="PR">PR</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="MG">MG</option>
+                                    </select>
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Inscrição Estadual</label>
+                                <input type="text" name="inscricao_estadual" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                        </div>
 
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Telefone Fixo</label>
+                                <input type="text" id="telefone_fornecedor" name="telefone" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">Celular/Whats</label>
+                                <input type="text" id="celular_fornecedor" name="celular" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; color: #555;">E-mail para Pedidos</label>
+                                <input type="email" name="email" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px;">
+                            </div>
+                        </div>
 
-<!-- ABA CADASTRO -->
+                        <div style="margin-bottom: 30px;">
+                            <label style="font-weight: 600; color: #555;">Observações Internas</label>
+                            <textarea name="observacoes" style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; height: 80px;"></textarea>
+                        </div>
 
-<div id="cadastro" class="tabcontent">
+                        <button type="submit" style="width: 100%; padding: 15px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                            <i class="fa fa-save"></i> CADASTRAR FORNECEDOR
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-<h3>Cadastro de Fornecedor</h3>
+            <div id="consulta" class="tabcontent" style="display:none;">
+                <div class="table-box" style="background: #ffffff; padding: 30px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #7B5FB3;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #333;"><i class="fa fa-list"></i> Fornecedores Cadastrados</h3>
+                        <form method="GET" action="/fornecedores" style="display: flex; gap: 10px;">
+                            <input type="text" name="busca" placeholder="Nome ou CNPJ..." style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px;">
+                            <button type="submit" style="background: #1976d2; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer;"><i class="fa fa-search"></i></button>
+                        </form>
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; text-align: left;">
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">Razão Social</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">CNPJ</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee;">Telefone</th>
+                                <th style="padding: 15px; border-bottom: 2px solid #eee; text-align: center;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    {% for fornecedor in fornecedores %}
+    <tr style="border-bottom: 1px solid #eee; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'" onmouseout="this.style.background='white'">
+        <td style="padding: 12px; font-weight: 600; color: #333;">{{ fornecedor.razao_social }}</td>
+        <td style="padding: 12px; color: #666;">{{ fornecedor.cnpj }}</td>
+        <td style="padding: 12px; color: #666;">{{ fornecedor.telefone }}</td>
+        <td style="padding: 12px; text-align: center;">
+            <div style="display: flex; gap: 8px; justify-content: center;">
+                <a href="/fornecedor/{{ fornecedor.id }}" title="Detalhes" 
+                   style="background: #1976d2; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                    <i class="fa fa-eye"></i> Visualizar
+                </a>
 
-<form method="POST" action="/salvar_fornecedor">
+                <a href="/excluir_fornecedor/{{ fornecedor.id }}" title="Excluir" onclick="return confirm('Deseja realmente excluir este fornecedor?')"
+                   style="background: #d32f2f; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                    <i class="fa fa-trash"></i> Excluir
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="form-group">
-<label>Razão Social</label>
-<input type="text" name="razao_social" required>
-</div>
+    <script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].style.background = "#e0e0e0";
+            tablinks[i].style.color = "#555";
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.style.background = "#1976d2";
+        evt.currentTarget.style.color = "white";
+    }
 
-<div class="form-group">
-<label>CNPJ</label>
-<input type="text" id="cnpj" name="cnpj">
-</div>
+    $(document).ready(function(){
+        $('#cnpj').mask('00.000.000/0000-00');
+        $('#cep').mask('00000-000');
+        $('#telefone_fornecedor').mask('(00) 0000-0000');
+        $('#celular_fornecedor').mask('(00) 00000-0000');
+    });
 
-<div class="form-group">
-<label>Nome do contato</label>
-<input type="text" name="contato">
-</div>
-
-<div class="form-group">
-<label>CEP</label>
-<input type="text" id="cep" name="cep">
-</div>
-
-<div class="form-group">
-<label>Endereço</label>
-<input type="text" name="endereco">
-</div>
-
-<div class="form-group">
-<label>Número</label>
-<input type="text" name="numero">
-</div>
-
-<div class="form-group">
-<label>Complemento</label>
-<input type="text" name="complemento">
-</div>
-
-<div class="form-group">
-<label>Bairro</label>
-<input type="text" name="bairro">
-</div>
-
-<div class="form-group">
-<label>Cidade</label>
-<input type="text" name="cidade">
-</div>
-
-<div class="form-group">
-<label>UF</label>
-
-<select name="uf">
-
-<option>AC</option>
-<option>AL</option>
-<option>AP</option>
-<option>AM</option>
-<option>BA</option>
-<option>CE</option>
-<option>DF</option>
-<option>ES</option>
-<option>GO</option>
-<option>MA</option>
-<option>MT</option>
-<option>MS</option>
-<option>MG</option>
-<option>PA</option>
-<option>PB</option>
-<option>PR</option>
-<option>PE</option>
-<option>PI</option>
-<option>RJ</option>
-<option>RN</option>
-<option>RS</option>
-<option>RO</option>
-<option>RR</option>
-<option>SC</option>
-<option>SP</option>
-<option>SE</option>
-<option>TO</option>
-
-</select>
-
-</div>
-
-<div class="form-group">
-<label>Telefone</label>
-<input type="text" id="telefone_fornecedor" name="telefone">
-</div>
-
-<div class="form-group">
-<label>Celular</label>
-<input type="text" id="celular_fornecedor" name="celular">
-</div>
-
-<div class="form-group">
-<label>Email</label>
-<input type="email" name="email">
-</div>
-
-<div class="form-group">
-<label>Observações</label>
-<br>
-<textarea name="observacoes" rows="5" cols="100"></textarea>
-</div>
-
-<button type="submit">Salvar Fornecedor</button>
-
-</form>
-
-</div>
-
-
-<!-- ABA CONSULTA -->
-
-<div id="consulta" class="tabcontent" style="display:none">
-
-<h3>Consultar Fornecedor</h3>
-
-<form method="GET" action="/fornecedores">
-
-<input type="text" name="busca" placeholder="Digite o fornecedor">
-<br><br>
-
-<button type="submit">Buscar</button>
-
-</form>
-
-<br>
-
-<table class="tabela-clientes">
-
-<tr>
-
-<th>Razão Social</th>
-<th>CNPJ</th>
-<th>Telefone</th>
-<th>Detalhes</th>
-<th>Excluir</th>
-
-</tr>
-
-{% for fornecedor in fornecedores %}
-
-<tr>
-
-<td>{{ fornecedor.razao_social }}</td>
-<td>{{ fornecedor.cnpj }}</td>
-<td>{{ fornecedor.telefone }}</td>
-
-<td>
-
-<a href="/fornecedor/{{ fornecedor.id }}" class="btn-detalhe">
-🔍
-</a>
-
-</td>
-
-<td>
-
-<a href="/excluir_fornecedor/{{ fornecedor.id }}" class="btn-excluir">
-🗑
-</a>
-
-</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    document.getElementById("defaultOpen").click();
+    </script>
 </body>
-
 </html>
