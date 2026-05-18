@@ -1,17 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from sqlalchemy import func
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import os
 from werkzeug.utils import secure_filename
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/img'
+app.config['SECRET_KEY'] = 'your-secret-key'
 
 # =====================================
 # CONFIG BANCO (Versão MySQL)
 # =====================================
 # senha usada no Workbench
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:PISmartEstoque%402026@localhost/smartestoque'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -20,16 +24,21 @@ db = SQLAlchemy(app)
 UPLOAD_FOLDER = 'static/img' 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 # =====================================
 # MODELS (Estrutura das Tabelas)
 # =====================================
 
-class Usuario(db.Model):
+class Usuario(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False) # Senha criptografada!
-    role = db.Column(db.String(20), default='vendedor') # 'admin', 'estoque', 'vendedor'
-
+    password = db.Column(db.String(255), nullable=False)
+    nome = db.Column(db.String(100))
+    role = db.Column(db.String(20), default='vendedor') 
+    
 class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(150))
@@ -93,9 +102,171 @@ class Caixa(db.Model):
     tipo = db.Column(db.String(10), nullable=False) 
     valor = db.Column(db.Float, nullable=False)   
 
+
+# =====================================
+# ROTAS DE AUTENTICAÇÃO E SESSÃO
+# =====================================
+
+@login_manager.user_loader
+def load_user(user_id):
+        return db.session.get(Usuario, int(user_id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        usuario = Usuario.query.filter_by(username=username).first()
+        
+        if usuario and check_password_hash(usuario.password, password):
+            login_user(usuario)
+            
+            if password == 'Mudar123':
+                flash("Sua senha foi resetada ou este é seu primeiro acesso. Por segurança, altere-a agora.", "aviso")
+                return redirect(url_for('alterar_senha'))
+            
+            if usuario.role == 'admin':
+                return redirect(url_for('dashboard'))
+            elif usuario.role == 'vendedor':
+                return redirect(url_for('vendas'))
+            else:
+                return redirect(url_for('index'))
+                
+        return render_template('login.html', erro="Usuário ou senha inválidos")
+        
+    return render_template('login.html')
+
+@app.route('/alterar_senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'POST':
+        nova_senha = request.form.get('nova_senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        
+        if nova_senha != confirmar_senha:
+            return render_template('alterar_senha.html', erro="As senhas não coincidem!")
+            
+        if nova_senha == 'Mudar123':
+            return render_template('alterar_senha.html', erro="Você não pode usar a senha padrão!")
+            
+        current_user.password = generate_password_hash(nova_senha)
+        current_user.primeiro_acesso = False
+        db.session.commit()
+        
+        if current_user.role == 'admin':
+            return redirect(url_for('dashboard'))
+        elif current_user.role == 'vendedor':
+            return redirect(url_for('vendas'))
+        else:
+            return redirect(url_for('index'))
+            
+    return render_template('alterar_senha.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+# =====================================
+# ROTAS DE GESTÃO DE EQUIPA (ADMIN)
+# =====================================
+
+@app.route('/usuarios')
+@login_required
+def gerenciar_usuarios():
+    if current_user.role != 'admin':
+        return "Acesso negado. Apenas administradores podem gerir a equipa.", 403
+    usuarios_lista = Usuario.query.all()
+    return render_template('usuarios.html', usuarios=usuarios_lista)
+
+
+import random
+
+@app.route('/cadastrar_usuario', methods=['POST'])
+@login_required
+def cadastrar_usuario():
+    if current_user.role != 'admin':
+        return "Acesso negado.", 403
+        
+    nome = request.form.get('nome').strip()
+    role = request.form.get('role')
+    
+    if not nome:
+        return "O nome é obrigatório.", 400
+
+    partes_nome = nome.split()
+    if len(partes_nome) >= 2:
+        iniciais = partes_nome[0][0] + partes_nome[-1][0]
+    else:
+        iniciais = partes_nome[0][:2]
+        
+    iniciais = iniciais.lower()
+    
+    while True:
+        numero_aleatorio = random.randint(10, 99)
+        username_gerado = f"{iniciais}{numero_aleatorio}"
+        if not Usuario.query.filter_by(username=username_gerado).first():
+            break
+
+    novo_usuario = Usuario(
+        username=username_gerado,
+        nome=nome,
+        role=role,
+        password=generate_password_hash('Mudar123')
+    )
+    
+    db.session.add(novo_usuario)
+    db.session.commit()
+    
+    flash(f"Usuário criado com sucesso! LOGIN: {username_gerado} | SENHA PADRÃO: Mudar123", "sucesso")
+    return redirect(url_for('gerenciar_usuarios'))
+
+@app.route('/deletar_usuario/<int:user_id>', methods=['POST'])
+@login_required
+def deletar_usuario(user_id):
+    if current_user.role != 'admin':
+        flash("Acesso negado. Permissão exclusiva do administrador.", "erro")
+        return redirect(url_for('gerenciar_usuarios'))
+        
+    usuario = db.session.get(Usuario, user_id)
+    
+    if usuario:
+        if usuario.id == current_user.id or usuario.username == 'admin':
+            flash("Operação inválida! Você não pode remover o administrador principal do sistema.", "erro")
+            return redirect(url_for('gerenciar_usuarios'))
+            
+        nome_deletado = usuario.nome
+        db.session.delete(usuario)
+        db.session.commit()
+        flash(f"Usuário '{nome_deletado}' foi removido do sistema com sucesso.", "sucesso")
+    else:
+        flash("Usuário não encontrado.", "erro")
+        
+    return redirect(url_for('gerenciar_usuarios'))
+
+
+@app.route('/resetar_senha/<int:user_id>', methods=['POST'])
+@login_required
+def resetar_senha(user_id):
+    if current_user.role != 'admin':
+        return "Acesso negado.", 403
+        
+    usuario = db.session.get(Usuario, user_id)
+    if usuario:
+        usuario.password = generate_password_hash('Mudar123')
+        db.session.commit()
+        flash(f"A senha de {usuario.nome} foi resetada com sucesso para 'Mudar123'!", "sucesso")
+        
+    return redirect(url_for('gerenciar_usuarios'))
+
 # =====================================
 # ROTAS
 # =====================================
+
 
 @app.route('/')
 def index():
@@ -329,7 +500,10 @@ def editar_produto(id):
     return render_template("editar_produto.html", produto=produto, fornecedores=fornecedores)
 
 @app.route('/estoque')
+@login_required
 def estoque():
+    if current_user.role == 'vendedor':
+        return "Acesso negado. Apenas administradores e operadores de estoque.", 403
     produtos = Produto.query.all()
     movimentacoes = Movimentacao.query.all()
     return render_template("estoque.html", produtos=produtos, movimentacoes=movimentacoes)
@@ -403,16 +577,31 @@ def atualizar_produto(id):
     return redirect('/produtos')
 
 @app.route('/caixa')
+@login_required
 def caixa():
-    lancamentos = Caixa.query.order_by(Caixa.data.desc()).all()
+    if current_user.role != 'admin':
+        return "Acesso restrito ao administrador financeiro.", 403
+    hoje = datetime.now()
+    primeiro_dia_mes = hoje.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     
-    total_entradas = db.session.query(db.func.sum(Caixa.valor)).filter(Caixa.tipo == 'entrada').scalar() or 0
-    total_saidas = db.session.query(db.func.sum(Caixa.valor)).filter(Caixa.tipo == 'saida').scalar() or 0
+    data_inicio_str = request.args.get('data_inicio', primeiro_dia_mes.strftime('%Y-%m-%d'))
+    data_fim_str = request.args.get('data_fim', hoje.strftime('%Y-%m-%d'))
     
-    return render_template('caixa.html', 
-                           lancamentos=lancamentos, 
-                           total_entradas=total_entradas, 
-                           total_saidas=total_saidas)
+    data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').replace(hour=0, minute=0, second=0)
+    data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+
+    # Consulta filtrada pelo período selecionado
+    lancamentos = Caixa.query.filter(Caixa.data.between(data_inicio, data_fim)).order_by(Caixa.data.desc()).all()
+    
+    total_entradas = sum(l.valor for l in lancamentos if l.tipo == 'entrada')
+    total_saidas = sum(l.valor for l in lancamentos if l.tipo == 'saida')
+
+    return render_template('caixa.html',
+                           lancamentos=lancamentos,
+                           total_entradas=total_entradas,
+                           total_saidas=total_saidas,
+                           data_inicio=data_inicio_str,
+                           data_fim=data_fim_str)
 
 @app.route('/vendas')
 def vendas():
@@ -470,38 +659,53 @@ def finalizar_venda():
         return "Erro ao processar a venda.", 500
 
 @app.route('/relatorios')
+@login_required
 def dashboard():
-    # 1. Primeiro definimos as variáveis base com valor zero
-    faturamento_total = 0
-    investimento_estoque = 0
+    if current_user.role != 'admin':
+        return "Acesso restrito ao administrador.", 403
 
-    # 2. Buscamos os valores reais no banco
-    faturamento_total = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'entrada').scalar() or 0
-    investimento_estoque = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'saida').scalar() or 0
+    # 1. Captura as datas do filtro (Vazio por padrão para listar tudo)
+    data_inicio_str = request.args.get('data_inicio', '')
+    data_fim_str = request.args.get('data_fim', '')
+
+    # 2. Consultas Base do Caixa (Financeiro)
+    query_faturamento = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'entrada')
+    query_investimento = db.session.query(func.sum(Caixa.valor)).filter(Caixa.tipo == 'saida')
+    query_vendas_count = db.session.query(func.count(Caixa.id)).filter(Caixa.tipo == 'entrada', Caixa.descricao.like('Venda%'))
     
-    # 3. Agora calculamos o lucro (as variáveis acima já existem com certeza)
-    lucro_real = faturamento_total - investimento_estoque
-
-    # 4. Cálculo do Ticket Médio
-    total_vendas_count = db.session.query(func.count(Caixa.id)).filter(
-        Caixa.tipo == 'entrada', 
-        Caixa.descricao.like('Venda%')
-    ).scalar() or 0
-    
-    # Uso seguro:
-    ticket_medio = (faturamento_total / total_vendas_count) if total_vendas_count > 0 else 0
-
-    # 5. Dados para o Gráfico
-    mais_vendidos = db.session.query(
+    # 3. Consulta Base do Gráfico (Idêntica à sua que funcionava)
+    query_mais_vendidos = db.session.query(
         Produto.nome, 
         func.sum(Movimentacao.quantidade)
-    ).join(Movimentacao).filter(Movimentacao.tipo == 'saida')\
-    .group_by(Produto.nome).order_by(func.sum(Movimentacao.quantidade).desc()).limit(5).all()
+    ).join(Movimentacao).filter(Movimentacao.tipo == 'saida')
+
+    # 4. Se o usuário aplicou o filtro, aplica de forma segura usando func.date()
+    if data_inicio_str and data_fim_str:
+        query_faturamento = query_faturamento.filter(func.date(Caixa.data).between(data_inicio_str, data_fim_str))
+        query_investimento = query_investimento.filter(func.date(Caixa.data).between(data_inicio_str, data_fim_str))
+        query_vendas_count = query_vendas_count.filter(func.date(Caixa.data).between(data_inicio_str, data_fim_str))
+        
+        # Tentativa segura: filtra a data da movimentação. Se o campo no banco for 'data', o SQLAlchemy resolve.
+        # Caso o gráfico continue sumindo COM FILTRO, comente a linha abaixo colocando um # na frente.
+        #query_mais_vendidos = query_mais_vendidos.filter(func.date(Movimentacao.data).between(data_inicio_str, data_fim_str))
+
+    # 5. Executa e calcula os resultados financeiros
+    faturamento_total = query_faturamento.scalar() or 0
+    investimento_estoque = query_investimento.scalar() or 0
+    lucro_real = faturamento_total - investimento_estoque
+
+    total_vendas_count = query_vendas_count.scalar() or 0
+    ticket_medio = (faturamento_total / total_vendas_count) if total_vendas_count > 0 else 0
+
+    # 6. Executa e monta os dados do Gráfico
+    mais_vendidos = query_mais_vendidos.group_by(Produto.nome)\
+                                       .order_by(func.sum(Movimentacao.quantidade).desc())\
+                                       .limit(5).all()
 
     labels_produtos = [item[0] for item in mais_vendidos]
     valores_produtos = [int(item[1]) for item in mais_vendidos]
 
-    # 6. Ranking de Margem
+    # 7. Ranking de Margem (Global - Mantido exatamente igual ao seu)
     produtos_lista = Produto.query.all()
     ranking_lucro = []
     for p in produtos_lista:
@@ -509,9 +713,9 @@ def dashboard():
             'nome': p.nome, 
             'margem': (p.preco_venda or 0) - (p.preco_compra or 0)
         })
-    
     ranking_lucro = sorted(ranking_lucro, key=lambda x: x['margem'], reverse=True)[:5]
 
+    # 8. Estoque Baixo (Global - Mantido exatamente igual ao seu)
     estoque_baixo = Produto.query.filter(Produto.estoque < 5).all()
 
     return render_template("dashboard.html", 
@@ -523,16 +727,43 @@ def dashboard():
                            valores_produtos=valores_produtos,
                            ranking_lucro=ranking_lucro,
                            estoque_baixo=estoque_baixo,
+                           data_inicio=data_inicio_str,
+                           data_fim=data_fim_str,
                            now=datetime.now())
-
 # =====================================
 # INICIAR SISTEMA
 # =====================================
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+        db.create_all() 
+        
+        from sqlalchemy import text
+        try:
+            db.session.execute(text('ALTER TABLE usuario ADD COLUMN nome VARCHAR(100)'))
+            db.session.commit()
+            print("Coluna 'nome' verificada/adicionada com sucesso!")
+        except Exception:
+            db.session.rollback()
 
-    if __name__ == "__main__":
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        try:
+            db.session.execute(text('ALTER TABLE usuario ADD COLUMN primeiro_acesso BOOLEAN DEFAULT TRUE'))
+            db.session.commit()
+            print("Coluna 'primeiro_acesso' verificada/adicionada com sucesso!")
+        except Exception:
+            db.session.rollback()
+            
+        user_admin = Usuario.query.filter_by(username='admin').first()
+        if not user_admin:
+            novo_admin = Usuario(
+                username='admin',
+                nome='Jessé Admin',
+                role='admin',
+                password=generate_password_hash('admin123'),
+                primeiro_acesso=False 
+            )
+            db.session.add(novo_admin)
+            db.session.commit()
+            print("Usuário Admin padrão verificado/criado com sucesso (admin / admin123)!")
+
+    app.run(host='0.0.0.0', port=5000, debug=True)

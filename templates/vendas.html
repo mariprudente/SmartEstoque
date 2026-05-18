@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Realizar Venda - Smart Estoque</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Realizar Venda -Smart Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 </head>
 <body>
     <div id="msg-erro" class="aviso-custom"></div>
@@ -74,6 +78,7 @@
 
         <div id="lista-venda" style="margin-top: 20px; display: none;">
             <h4 style="color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;">Itens do Pedido:</h4>
+            <div style="overflow-x: auto; width: 100%;">
             <table style="width: 100%; font-size: 13px; margin-bottom: 15px;" id="tabela-itens">
                 <thead>
                     <tr style="text-align: left; color: #666;">
@@ -86,6 +91,7 @@
                 <tbody id="corpo-tabela">
                     </tbody>
             </table>
+            </div>
             <div style="text-align: right; font-weight: bold; color: #2e7d32; margin-bottom: 15px;">
                 Total Geral: <span id="total-venda-casada">R$ 0,00</span>
             </div>

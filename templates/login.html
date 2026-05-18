@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Estoque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+
+    <div class="form-box" style="width: 100%; max-width: 400px; padding: 40px; text-align: center;">
+        <h2 style="color: #1e3a8a; margin-bottom: 10px;"><i class="fa fa-lock"></i> Smart Estoque</h2>
+        <p style="color: #666; margin-bottom: 30px;">Introduza as suas credenciais</p>
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label><i class="fa fa-user"></i> Utilizador</label>
+                <input type="text" name="username" required style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 8px;">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 30px;">
+                <label><i class="fa fa-key"></i> Senha</label>
+                <input type="password" name="password" required style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 8px;">
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 15px; background: #1e3a8a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                ENTRAR NO SISTEMA
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

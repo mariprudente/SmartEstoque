@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Primeiro Acesso - Atualizar Senha</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .login-container { width: 100%; max-width: 400px; margin: 100px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 10px; background: #1e3a8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body style="background-color: #f3f4f6; font-family: Arial, sans-serif;">
+    <div class="login-container">
+        <h2 style="text-align: center; color: #1e3a8a;">Primeiro Acesso</h2>
+        <p style="font-size: 13px; color: #666; text-align: center; margin-bottom: 20px;">Por motivos de segurança, você precisa alterar sua senha padrão antes de continuar.</p>
+        
+        {% if erro %}
+            <div style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center;">
+                {{ erro }}
+            </div>
+        {% endif %}
+
+        <form action="{{ url_for('alterar_senha') }}" method="POST">
+            <div class="input-group">
+                <input type="password" name="nova_senha" placeholder="Nova Senha" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="confirmar_senha" placeholder="Confirme a Nova Senha" required>
+            </div>
+            <button type="submit" class="btn-submit">SALVAR E ENTRAR</button>
+        </form>
+    </div>
+</body>
+</html>

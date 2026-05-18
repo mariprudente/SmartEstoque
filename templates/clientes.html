@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Clientes - Smart Estoque</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Cliente - Smart Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
@@ -98,10 +99,12 @@
                                 <option value="cpf">CPF</option>
                             </select>
                             <input type="text" name="busca" placeholder="Pesquisar..." style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px;">
-                            <button type="submit" style="background: #1976d2; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer;"><i class="fa fa-search"></i></button>
+                            <button type="submit" style="background: #1976d2; color: white; border: none; border-radius: 20px; padding: 0 20px; cursor: pointer; font-weight: bold;">
+                    <i class="fa fa-search"></i> Pesquisar
+                </button>
                         </form>
                     </div>
-                    
+                    <div style="overflow-x: auto; width: 100%;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: #f8f9fa; text-align: left;">
@@ -133,6 +136,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,15 +1,36 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<input type="checkbox" id="menu-toggle" style="display: none;">
+<label for="menu-toggle" class="btn-menu-hamburguer">
+    <i class="fa fa-bars"></i> MENU SISTEMA
+</label>
+
 <div class="sidebar">
+    <h2>SMART ESTOQUE</h2>
+    
+    <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; text-align: center;">
+        <div style="width: 50px; height: 50px; background: #3b82f6; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa fa-user" style="color: white; font-size: 24px;"></i>
+        </div>
+        <h4 style="margin: 0; color: white; font-size: 16px;">{{ current_user.nome }}</h4>
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: bold;">
+            <i class="fa fa-shield"></i> {{ current_user.role }}
+        </span>
+    </div>
 
-<h2>SMART ESTOQUE</h2>
-
-<a href="/">Inicio</a>
-<a href="/vendas">Vendas</a>
-<a href="/produtos">Produtos</a>
-<a href="/clientes">Clientes</a>
-<a href="/fornecedores">Fornecedores</a>
-<a href="/estoque">Controle de Estoque</a>
-<a href="/caixa">Caixa</a>
-<a href="#">Configurações</a>
-<a href="{{ url_for('dashboard') }}" class="menu-item"><i class="fa fa-line-chart"></i> Relatórios / Dashboard</a>
-
+    <a href="/"><i class="fa fa-home"></i> Início</a>
+    <a href="/vendas"><i class="fa fa-shopping-cart"></i> Realizar Venda</a>
+    <a href="/estoque"><i class="fa fa-refresh"></i> Controle de Estoque</a>
+    <a href="/produtos"><i class="fa fa-box"></i> Produtos</a>
+    <a href="/clientes"><i class="fa fa-users"></i> Clientes</a>
+    <a href="/fornecedores"><i class="fa fa-truck"></i> Fornecedores</a>
+    <a href="/caixa"><i class="fa fa-usd"></i> Caixa / Financeiro</a>
+    <a href="/relatorios"><i class="fa fa-chart-bar"></i> Relatórios</a>
+    
+    {% if current_user.role == 'admin' %}
+        <a href="/usuarios"><i class="fa fa-user-plus"></i> Gerenciar Equipe</a>
+    {% endif %}
+    
+    <a href="/logout" style="background-color: #e74c3c; margin-top: 20px; border-radius: 5px;"><i class="fa fa-sign-out"></i> Sair</a>
 </div>

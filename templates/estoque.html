@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Controle de Estoque - Smart Estoque</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Controle de Estoque - Smart Estoque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -68,7 +69,7 @@
             <div id="historico" class="tabcontent" style="display:none;">
                 <div class="table-box" style="background: #ffffff; padding: 30px; border-radius: 0 15px 15px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #1976d2;">
                     <h3 style="margin-bottom: 20px; color: #333;"><i class="fa fa-list-alt"></i> Últimas Movimentações</h3>
-                    
+                    <div style="overflow-x: auto; width: 100%;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: #f8f9fa; text-align: left;">
@@ -97,6 +98,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
